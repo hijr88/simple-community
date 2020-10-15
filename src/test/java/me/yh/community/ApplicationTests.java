@@ -10,5 +10,4 @@ class ApplicationTests {
     void di() {
 
     }
-
 }

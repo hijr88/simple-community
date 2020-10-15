@@ -1,7 +1,7 @@
 ### 프로젝트 설정
 - JDK 11
 - Gradle
-- 스프링부트
+- Spring Boot
 - JPA, Querydsl
 - Thymeleaf
 - docker 를 이용해 PostgreSQL 사용
@@ -11,4 +11,5 @@ docker run -p 5432:5432 -e POSTGRES_USER=woo -e POSTGRES_PASSWORD=1234 -e POSTGR
 docker exec -i -t postgres_spring bash
 psql --username woo --dbname community
 ```
+- Flyway 를 이용한 마이그레이션
 

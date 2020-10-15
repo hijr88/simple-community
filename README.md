@@ -12,4 +12,10 @@ docker exec -i -t postgres_spring bash
 psql --username woo --dbname community
 ```
 - Flyway 를 이용한 마이그레이션
+---
+### 프로젝트 기능
+- 회원
+- 글 게시판
+- 이미지 게시판
+- 관리자
 

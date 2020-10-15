@@ -23,8 +23,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+
     implementation 'org.imgscalr:imgscalr-lib:4.2'
     implementation 'com.querydsl:querydsl-jpa'
     implementation 'org.flywaydb:flyway-core'

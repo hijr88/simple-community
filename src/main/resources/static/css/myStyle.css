@@ -1,0 +1,427 @@
+/* bootstrap */
+.pagination > li > a {
+    background-color: white;
+    color: #775cdc;
+}
+
+.pagination > .active > a {
+    background-color: #775cdc !Important;
+    color: white;
+    border: solid 1px #775cdc !Important;
+}
+
+.pagination > .active > a:hover {
+    background-color: #775cdc !Important;
+    border: solid 1px #775cdc;
+}
+
+.form-control:focus {
+    border-color: #775cdc;
+    box-shadow: 0 0 1px rgba(150, 21, 155, 0.6);
+}
+
+select.form-control:focus {
+    box-shadow: none;
+}
+
+div[class= input-group-append] span[class ~= input-group-text] {
+    cursor: pointer;
+}
+
+div[class= input-group-append] span[class ~= input-group-text]:hover {
+    background-color: #ccd2d8 !important;
+}
+
+div[class= input-group-append] button[class ~= input-group-text]:focus {
+    outline: 0;
+}
+
+.btn-outline-dark:hover {
+    color: inherit;
+    background-color: inherit;
+    border-color: inherit;
+}
+
+.action .btn-outline-dark:hover {
+    background-color: #f7f7f7;
+}
+
+/* bootstrap */
+
+
+/* common */
+
+@font-face {
+    font-family: 'Cafe24Oneprettynight';
+    src: url('../font/Cafe24Oneprettynight.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'MapoGoldenPier';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/MapoGoldenPierA.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Jua';
+    src: url('../font/Jua-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.font-Mapo {
+    font-family: 'MapoGoldenPier', serif;
+}
+
+.font-pretty-night {
+    font-family: 'Cafe24Oneprettynight', serif;
+}
+
+.font-Jua {
+    font-family: 'Jua', sans-serif;
+}
+
+.black {
+    color: black;
+}
+
+.white {
+    color: white;
+}
+
+.hide {
+    display: none !important;
+}
+
+.bg-light-gray {
+    background-color: #f5f6f8;
+}
+
+.bg-black {
+    background-color: black;
+}
+
+.bg-purple {
+    background-color: #775cdc !important; /*#775cdc*/
+    /*background-color: #772ce8 !important;  /*#772ce8*/
+    color: white !important;
+}
+
+.bg-white {
+    background-color: white !important;
+}
+
+.bg-purple-hover:hover {
+    background-color: #6c52cc !important;
+}
+
+.btn-purple {
+    background-color: #775cdc;
+    color: white;
+}
+
+.btn-purple:hover {
+    background-color: #772ce8;
+    color: white;
+}
+
+.btn-purple:focus {
+    background-color: #772ce8;
+    color: white;
+}
+
+.btn-outline-purple {
+    color: #775cdc;
+    border-color: #775cdc;
+}
+
+.btn-outline-purple:hover {
+    color: #fff;
+    background-color: #775cdc;
+    border-color: #775cdc;
+}
+
+.btn-outline-purple:focus {
+    box-shadow: 0 0 0 0.2rem rgba(119, 92, 220, .5);
+}
+
+
+input:read-only, textarea:read-only {
+    background-color: white !important;
+}
+
+textarea.no-resize {
+    resize: none !important;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+/* common */
+
+
+/*header*/
+a.nav-link {
+    color: #e1dbf7 !important;
+    padding: 1rem 1rem;
+}
+
+a.nav-link:hover {
+    color: white !important;
+}
+
+/*header*/
+
+/* index페이지*/
+.main-img {
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+/*로그인 회원가입*/
+.background-overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: linen;
+}
+
+.login {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: linen;
+}
+
+.login .action span:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+section.register {
+    position: absolute;
+    left: 50%;
+    /*top: 50%;*/
+    transform: translateX(-50%);
+    /*transform: translateX(-50%) translateY(-50%);*/
+}
+
+.login-title {
+    padding: 16px;
+    text-align: center;
+    font-size: 34px;
+    font-weight: 600;
+    color: #181c27;
+}
+
+span[class *=error-] {
+    height: 28px;
+    color: red;
+}
+
+div#background {
+    position: fixed;
+    z-index: 9;
+    background-color: rgba(0, 0, 0, 0.2);
+    left: 0;
+    top: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+div[role=alert] {
+    position: fixed;
+    background-color: white;
+    left: 50%;
+    top: 10%;
+    display: inline-block;
+    z-index: 1;
+    transform: translate(-50%);
+    transition: ease-in-out;
+    animation: showAlert 0.2s forwards;
+}
+
+div.btn-outline-danger[role=alert]:hover {
+    background-color: white;
+    color: rgb(220, 53, 69);
+}
+
+div.btn-outline-success[role=alert]:hover {
+    background-color: white;
+    color: rgb(40, 167, 69);
+}
+
+@keyframes showAlert {
+    0% {
+        transform: translate(-50%) scaleX(0);
+    }
+
+    100% {
+        transform: translate(-50%) scaleX(1);
+    }
+}
+
+/*로그인 회원가입*/
+
+/*boardList*/
+
+#board-list h1 {
+    font-family: 'Jua', sans-serif;
+    color: #de6b6b;
+    display: inline;
+    box-shadow: 3px 1px 11px 3px #ffdbdb;
+}
+
+table.tbl-board thead th, table.tbl-board tbody td {
+    padding: .75rem 0.2rem;
+}
+
+table.tbl-board thead th {
+    border-top: 1px solid black;
+    white-space: nowrap;
+}
+
+table.tbl-board {
+    font-family: 'Cafe24Oneprettynight', serif;
+    color: black !important;
+}
+
+table.tbl-board tbody tr td {
+    border-bottom: 1px solid #ddd;
+    color: black !important;
+}
+
+table.tbl-board tbody tr a {
+    color: black !important;
+}
+
+table.tbl-board tbody tr td.tbl-txt-writer {
+    white-space: nowrap;
+}
+
+table.tbl-board tbody tr:hover {
+    background-color: #fdf5e6 !important;
+}
+
+table.tbl-board tbody tr:hover a {
+    text-decoration: underline;
+}
+
+.pager {
+    display: inline-block;
+}
+
+.reply-count {
+    padding-right: .4em;
+    padding-left: .4em;
+    border-radius: 10rem;
+    border: 1px solid rgb(218, 210, 210);
+    color: rgb(247, 87, 14);
+    font-size: .9rem;
+    font-weight: 800;
+    margin-left: 3px;
+}
+
+.current-page-num {
+    color: #d91ca8;
+}
+
+.icon-reply {
+    width: 7px;
+    height: 7px;
+    display: inline-block;
+    background: url("/web/resources/images/reply.png");
+    margin-right: 3px;
+}
+
+/*board*/
+
+/*boardDetail*/
+#comment-view {
+    background-color: #f3f0f0;
+}
+
+.comment-option {
+    cursor: pointer;
+}
+
+.comment-content {
+    word-break: break-all;
+}
+
+.dropdown-menu {
+    min-width: 0;
+}
+
+.dropdown-item:not(:first-child) {
+    border-top: 1px solid lightgray;
+}
+
+div.comment-write-box {
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    border-collapse: collapse;
+}
+
+div.comment-write-box textarea {
+    border: 1px solid white;
+}
+
+.board-info {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #666;
+}
+
+#boardDetail .table td,
+#boardDetail .table th {
+    border-top: 0;
+}
+
+#boardDetail .table tr {
+    border-top: 1px solid #dee2e6
+}
+
+#boardDetail .table th {
+    padding: 0.7rem 0.75rem 0.1rem;
+}
+
+#boardDetail .table td {
+    padding: 0.1rem 0.75rem 0.7rem;
+}
+
+@media (min-width: 768px) {
+
+    #boardDetail .table th,
+    #boardDetail .table td {
+        padding: .75em;
+    }
+}
+
+#boardDetail .btn:focus {
+    box-shadow: 0 0 0 0.2rem rgba(246, 199, 255, 0.5) !important;
+}
+
+#boardDetail a:hover {
+    text-decoration: none;
+}
+
+#boardDetail li .form-control {
+    border: 1px solid white;
+}
+
+#boardDetail input[type=radio] {
+    display: none;
+}

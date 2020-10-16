@@ -1,4 +1,4 @@
-package me.yh.community.config;
+package me.yh.community.config.security;
 
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -25,7 +26,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
                 .formLogin()
                 .loginPage("/member/login")
-                .permitAll();
+                .loginProcessingUrl("/member/loginProcess")
+                .failureHandler(authenticationFailureHandler())
+                .permitAll()
+            .and()
+                .logout()
+                .logoutSuccessUrl("/")
+                .invalidateHttpSession(true);
     }
 
     @Override
@@ -36,17 +43,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
-                .withUser("admin")
-                .password(passwordEncoder().encode("admin"))
-                .roles("ADMIN")
-                .and()
-                .withUser("user")
-                .password(passwordEncoder().encode("user"))
-                .roles("USER");
+                .withUser("admin").password(passwordEncoder().encode("admin")).roles("ADMIN")
+            .and()
+                .withUser("user").password(passwordEncoder().encode("user")).roles("USER");
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+    @Bean //인증 실패 핸들러
+    public AuthenticationFailureHandler authenticationFailureHandler() {
+        return new CustomAuthenticationFailureHandler();
     }
 }

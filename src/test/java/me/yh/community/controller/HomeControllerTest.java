@@ -1,5 +1,6 @@
 package me.yh.community.controller;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +30,22 @@ class HomeControllerTest {
                 .andExpect(status().isOk());
     }
 
-    @WithMockUser
     @Test
-    void principal() throws Exception {
+    @WithMockUser
+    @DisplayName("인증된 상태에서 접근 가능한지")
+    void principal_success() throws Exception {
         mockMvc.perform(get("/pra"))
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithAnonymousUser
+    @DisplayName("인증 안된 상태에서 접근에 실패하는지 = 리다이렉트")
+    void principal_fail() throws Exception {
+        mockMvc.perform(get("/pra"))
+                .andDo(print())
+                .andExpect(status().is3xxRedirection());
     }
 
 }

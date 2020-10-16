@@ -9,8 +9,8 @@ function errTextInit() {
 
 function validateLogin(form) {
     //4~12  //4~20
-    if (form.id.value.length === 0) {
-        document.querySelector('.error-id').textContent = '아이디를 입력해주세요.';
+    if (form.username.value.length === 0) {
+        document.querySelector('.error-username').textContent = '아이디를 입력해주세요.';
         return false;
     }
     if (form.password.value.length === 0) {
@@ -20,8 +20,9 @@ function validateLogin(form) {
     return true;
 }
 
-async function findID() {
-    const result = document.querySelector('#search-ID-Result');
+//아이디 찾기
+async function findUsername() {
+    const result = document.querySelector('#find-username-result');
     const email = document.querySelector('#input-email').value.trim();
 
     if (email.length === 0) {
@@ -30,7 +31,7 @@ async function findID() {
         return;
     }
 
-    const response = await fetch(`findId?email=${email}`, {
+    const response = await fetch(`findusername?email=${email}`, {
         headers: {'Content-Type': 'text/plain'}
     });
     const responseText = await response.text();
@@ -43,20 +44,25 @@ async function findID() {
     }
 }
 
+//아이디와 이메일이 일치하는 회원 찾기
 async function findMember() {
-    const result = document.querySelector('#search-Member-Result');
-    const info = document.querySelectorAll('#searchMember input');
-    const id = info[0].value.trim();
+    const result = document.querySelector('#find-member-result');
+    const info = document.querySelectorAll('#find-member input');
+    const username = info[0].value.trim();
     const email = info[1].value.trim();
 
-    if (id.length === 0 || email.length === 0) {
+    if (username.length === 0 || email.length === 0) {
         result.style.color = '#FF0000';
         result.textContent = '아이디와 이메일을 입력해주세요.';
         return;
     }
-    const response = await fetch(`findMember?id=${id}&email=${email}`, {
+    const response = await fetch(`findmember?username=${username}&email=${email}`, {
         headers: {'Content-Type': 'text/plain'}
     });
+    if(!response.ok){
+        alert('Server Error!!')
+        return;
+    }
     const responseText = await response.text();
     if (responseText === '0') { //검색된 정보가 없는경우
         result.style.color = 'rgb(255, 98, 98)';
@@ -67,32 +73,32 @@ async function findMember() {
     }
 }
 
-$('#searchID').on('hidden.bs.modal', function () {
-    const result = document.querySelector('#search-ID-Result');
+$('#find-username').on('hidden.bs.modal', function () {
+    const result = document.querySelector('#find-username-result');
     const email = document.querySelector('#input-email');
     result.textContent = '';
     email.value = '';
 })
 
-$('#searchMember').on('hidden.bs.modal', function () {
-    const result = document.querySelector('#search-Member-Result');
-    const info = document.querySelectorAll('#searchMember input');
+$('#find-member').on('hidden.bs.modal', function () {
+    const result = document.querySelector('#find-member-result');
+    const info = document.querySelectorAll('#find-member input');
     result.textContent = '';
     info[0].value = '';
     info[1].value = '';
 })
 
 async function getNewPassword() {
-    const info = document.querySelectorAll('#searchMember input');
-    const id = info[0].value.trim();
+    const info = document.querySelectorAll('#find-member input');
+    const username = info[0].value.trim();
     const email = info[1].value.trim();
 
     showLoading();
-    const response = await fetch(`newPassword?id=${id}&email=${email}`, {
+    const response = await fetch(`newPassword?username=${username}&email=${email}`, {
         headers: {'Content-Type': 'text/plain'}
     });
     closeLoading();
-    $('#searchMember').modal('hide');
+    $('#find-member').modal('hide');
     const responseText = await response.text();
     if (responseText === 'OK') {
         showAlert('success', '메일을 발송했습니다.', false);

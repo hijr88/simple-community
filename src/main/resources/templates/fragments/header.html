@@ -26,20 +26,20 @@
                 <ul class="navbar-nav  ml-auto align-items-md-center">
                     <th:block sec:authorize="isAnonymous()">
                         <li class="nav-item">
-                            <a class="nav-link" th:href="@{/member/login}">
+                            <a class="nav-link" th:href="@{/members/login}">
                                 <i class="fas fa-sign-in-alt pr-1"></i>
                                 로그인
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" th:href="@{/member/register}">
+                            <a class="nav-link" th:href="@{/members/register}">
                                 <i class="fas fa-user-plus pr-1"></i>회원가입
                             </a>
                         </li>
                     </th:block>
                     <th:block sec:authorize="isAuthenticated()">
                         <li class="nav-item">
-                            <a class="d-md-none nav-link" th:href="@{/member/me}">
+                            <a class="d-md-none nav-link" th:href="@{/members/me}">
                                 <i class="fas fa-user pr-1"></i>내정보
                             </a>
                         </li>

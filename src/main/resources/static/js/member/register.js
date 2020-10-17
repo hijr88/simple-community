@@ -2,49 +2,48 @@
 //엔터키 막기
 notAllowEnter();
 
-/*SSL 을 사용하지 않는 경우 GET 및 POST 는 동일합니다. SSL이 존재할 때 POST는 GET에 비해 더 안전하지만.
-GET은 암호화되지 않은 데이터를 전송하지만 SSL을 사용하면 전송 될 HTTP 데이터가 암호화되므로 보안이 유지됩니다.*/
-
 //아이디체크
-function checkId() {
-    const id = document.querySelector("input[name=id]");
-    const error = document.querySelector(".error-id");
+function isDuplicatedUsername() {
+    const username = document.querySelector("input[name=username]");
+    const error = document.querySelector(".error-username");
 
     //아이디 유효성체크
-    const regId = /^[a-z0-9]{4,12}$/;
-    if (!regId.test(id.value)) {
+    const regUsername = /^[a-z0-9]{4,12}$/;
+    if (!regUsername.test(username.value)) {
         error.textContent = '아이디는 공백제외 4~12자의 영문 소문자, 숫자만 사용 가능합니다.';
         error.style.color = 'red';
-        id.focus();
+        username.focus();
         return;
     }
 
     //아이디중복체크
-    fetch('checkId?id=' + id.value.trim(), {
-        headers: {'Content-Type': 'text/plain'}
+    fetch('/api/members/check-username', {
+        headers: {'Content-Type': 'text/plain'},
+        method: 'post',
+        body: username.value.trim()
     })
-        .then(response => {
-            if (response.status === 200) {
-                error.textContent = '사용 가능한 아이디입니다.';
-                error.style.color = 'blue';
-                document.querySelector("#idCheck").value = 'Y';
-            } else if (response.status === 409) {
-                error.textContent = '중복된 아이디입니다.';
-                error.style.color = 'red';
-                document.querySelector("#idCheck").value = 'N';
-            } else {
-                alert('id, server error');
-            }
-        });
+    .then(response => {
+        if (response.status === 200) {
+            error.textContent = '사용 가능한 아이디입니다.';
+            error.style.color = 'blue';
+            document.querySelector("#username-check").value = 'Y';
+        } else if (response.status === 409) {
+            error.textContent = '중복된 아이디입니다.';
+            error.style.color = 'red';
+            document.querySelector("#username-check").value = 'N';
+        } else {
+            alert('username, server error');
+        }
+    });
 }
 
 //중복확인을 거쳤지만 다시 아이디가 변경된경우
-function resetId() {
-    if (document.querySelector("#idCheck").value === 'Y') {
+function resetUsername() {
+    if (document.querySelector("#username-check").value === 'Y') {
         if (functionKey.includes(event.keyCode)) return;
         alert('아이디가 변경되었습니다.\n중복확인을 다시 해주세요.');
-        document.querySelector("#idCheck").value = 'N';
-        document.querySelector(".error-id").textContent = '';
+        document.querySelector("#username-check").value = 'N';
+        document.querySelector(".error-username").textContent = '';
     }
 }
 
@@ -86,18 +85,20 @@ function validateEmail() {
     }
 
     //이메일중복체크
-    fetch('checkEmail?email=' + email.value.trim(), {
-        headers: {'Content-Type': 'text/plain'}
+    fetch('/api/members/check-email', {
+        headers: {'Content-Type': 'text/plain'},
+        method: 'post',
+        body: email.value.trim()
     }).then(response => {
         if (response.status === 200) {
             error.textContent = '사용 가능한 이메일입니다.';
             error.style.color = 'blue';
-            document.querySelector("#emailCheck").value = 'Y';
+            document.querySelector("#email-check").value = 'Y';
             document.querySelector("#gCode").classList.remove("hide");
         } else if (response.status === 409) {
             error.textContent = '중복된 이메일입니다.';
             error.style.color = 'red';
-            document.querySelector("#emailCheck").value = 'N';
+            document.querySelector("#email-check").value = 'N';
             document.querySelector("#gCode").classList.add("hide");
         } else {
             alert('email, server error');
@@ -107,29 +108,30 @@ function validateEmail() {
 
 //중복확인을 거쳤지만 다시 이메일이 변경된경우 초기화
 function resetEmail(err) {
-    if (document.querySelector("#emailCheck").value === 'Y') {
-        if (functionKey.includes(event.keyCode)) return;
-        if (err !== 2)
+    if (document.querySelector("#email-check").value === 'Y') {
+        if (err !== 2) {
+            if (functionKey.includes(event.keyCode)) return;
             alert('이메일이 변경되었습니다.\n 중복확인을 다시 해주세요.');
-        document.querySelector("#emailCheck").value = 'N';
+        }
+        document.querySelector("#email-check").value = 'N';
         document.querySelector(".error-email").textContent = '';
-        document.querySelector("#codeCheck").value = 'N';
+        document.querySelector("#code-check").value = 'N';
         document.querySelector(".error-code").textContent = '';
         document.querySelector("#gCode").classList.add("hide");
-        document.querySelector("#isNewCode").value = 'N';
+        document.querySelector("#is-new-code").value = 'N';
         document.querySelector("#gCode").value = '인증번호 받기';
     }
 }
 
 //인증번호 발급  인증번호 받기 버튼
 function getCode() {
-    if (document.querySelector("#emailCheck").value === 'N') {
+    if (document.querySelector("#email-check").value === 'N') {
         alert('이메일을 확인하세요.');
         document.querySelector("input[name=email]").focus();
         return;
     }
-    if (document.querySelector("#codeCheck").value === 'Y') {
-        document.querySelector("#codeCheck").value = 'N';
+    if (document.querySelector("#code-check").value === 'Y') {
+        document.querySelector("#code-check").value = 'N';
     }
     const email = document.querySelector("input[name=email]");
     const xhttp = new XMLHttpRequest();
@@ -144,7 +146,7 @@ function getCode() {
                     closeLoading(); //로딩창 끄기
                     document.querySelector(".error-email").textContent = "인증번호를 전송했습니다.";
                     document.querySelector(".error-email").style.color = 'green';
-                    document.querySelector("#isNewCode").value = 'Y';
+                    document.querySelector("#is-new-code").value = 'Y';
                     document.querySelector("#gCode").value = '인증번호 재전송';
                     showAlert('success', '인증번호를 전송하였습니다.', true);
                 } else {
@@ -156,18 +158,18 @@ function getCode() {
             }
         }
     }
-    xhttp.open("GET", "createCode?email=" + email.value.trim(), true);
+    xhttp.open("post", "/api/members/create-code", true);
     xhttp.setRequestHeader('Content-Type', 'text/plain');
-    xhttp.send();
+    xhttp.send(email.value.trim());
 }
 
 //인증번호 전송  인증번호 확인버튼
 function sendCode() {
-    if (document.querySelector("#isNewCode").value === 'N') {
+    if (document.querySelector("#is-new-code").value === 'N') {
         alert('인증번호를 받아주세요.');
         return;
     }
-    if (document.querySelector("#codeCheck").value === 'Y') {
+    if (document.querySelector("#code-check").value === 'Y') {
         showAlert('success', '이미 인증이 되었습니다.', true);
         return;
     }
@@ -181,19 +183,21 @@ function sendCode() {
     }
     const errorCode = document.querySelector(".error-code");
 
-    fetch('checkCode?code=' + code.value.trim(), {
-        //headers:{'Content-Type': 'text/plain'}
+    fetch('/api/members/check-code', {
+        headers:{'Content-Type': 'text/plain'},
+        method: 'post',
+        body: code.value.trim()
     })
         .then(response => response.text())
         .then(text => {
             if (text === '1') {
                 errorCode.textContent = "인증을 확인했습니다.";
                 errorCode.style.color = 'blue';
-                document.querySelector("#codeCheck").value = 'Y'
+                document.querySelector("#code-check").value = 'Y'
             } else if (text === '0') {
                 errorCode.textContent = "인증번호가 일치하지 않습니다.";
                 errorCode.style.color = 'red';
-                document.querySelector("#codeCheck").value = 'N'
+                document.querySelector("#code-check").value = 'N'
             } else {
                 alert('인증번호 에러\n이메일 인증을 다시해주세요');
                 resetEmail(2);
@@ -205,9 +209,9 @@ function sendCode() {
 function addMember(form) {
     if (functionKey.includes(event.keyCode)) return false;
     //아이디 체크
-    if (form.querySelector("#idCheck").value === 'N') {
+    if (form.querySelector("#username-check").value === 'N') {
         alert('아이디를 확인하세요.');
-        form.querySelector("input[name=id]").focus();
+        form.querySelector("input[name=username]").focus();
         return false;
     }
     //비밀번호 체크
@@ -225,21 +229,21 @@ function addMember(form) {
         form.querySelector(".error-pw").textContent = '';
     }
     //닉네임 체크
-    const name = form.querySelector("input[name=name]");
+    const name = form.querySelector("input[name=nickname]");
     const nameErr = form.querySelector(".error-name");
     if (!validateName(name, nameErr)) return false;
 
     //이메일 체크
-    if (form.querySelector("#emailCheck").value === 'N') {
+    if (form.querySelector("#email-check").value === 'N') {
         alert('이메일을 확인하세요.');
         form.querySelector("input[name=email]").focus();
         return false;
     }
-    if (form.querySelector("#isNewCode").value === 'N') {
+    if (form.querySelector("#is-new-code").value === 'N') {
         alert('인증번호를 받아주세요.');
         return false;
     }
-    if (form.querySelector("#codeCheck").value === 'N') {
+    if (form.querySelector("#code-check").value === 'N') {
         alert('인증을 확인해주세요.');
         form.querySelector("#code").focus();
         return false;

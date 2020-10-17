@@ -31,9 +31,13 @@ async function findUsername() {
         return;
     }
 
-    const response = await fetch(`findusername?email=${email}`, {
+    const response = await fetch(`find-username?email=${email}`, {
         headers: {'Content-Type': 'text/plain'}
     });
+    if(!response.ok){
+        alert('Server Error!!')
+        return;
+    }
     const responseText = await response.text();
     if (responseText.length === 0) { //검색된 아이디가 없는경우
         result.style.color = 'rgb(255, 98, 98)';
@@ -56,7 +60,7 @@ async function findMember() {
         result.textContent = '아이디와 이메일을 입력해주세요.';
         return;
     }
-    const response = await fetch(`findmember?username=${username}&email=${email}`, {
+    const response = await fetch(`find-member?username=${username}&email=${email}`, {
         headers: {'Content-Type': 'text/plain'}
     });
     if(!response.ok){
@@ -94,9 +98,13 @@ async function getNewPassword() {
     const email = info[1].value.trim();
 
     showLoading();
-    const response = await fetch(`newPassword?username=${username}&email=${email}`, {
+    const response = await fetch(`change-new-password?username=${username}&email=${email}`, {
         headers: {'Content-Type': 'text/plain'}
     });
+    if(!response.ok){
+        alert('Server Error!!')
+        return;
+    }
     closeLoading();
     $('#find-member').modal('hide');
     const responseText = await response.text();

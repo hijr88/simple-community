@@ -25,8 +25,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()    //인증 요청
             .and()
                 .formLogin()
-                .loginPage("/member/login")
-                .loginProcessingUrl("/member/loginProcess")
+                .loginPage("/members/login")
+                .loginProcessingUrl("/members/loginProcess")
                 .failureHandler(authenticationFailureHandler())
                 .permitAll()
             .and()

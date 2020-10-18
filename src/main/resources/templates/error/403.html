@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>접근 거부</title>
+
+    <link rel="stylesheet" th:href="@{/css/error.css} ">
+</head>
+
+<body style="margin: 0">
+<div class="over-lay">
+    <div class="content">
+        <div class="img">
+            <img alt="page_not_found" th:src="@{/images/denied.png}">
+        </div>
+        <h2>접근 권한이 없습니다. </h2>
+        <a th:href="@{/}" class="back-home">돌아가기</a>
+    </div>
+</div>
+</body>
+</html>

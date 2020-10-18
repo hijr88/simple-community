@@ -5,6 +5,8 @@ import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.access.expression.SecurityExpressionHandler;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -13,6 +15,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.FilterInvocation;
+import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
@@ -34,21 +38,28 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         this.dataSource = dataSource;
     }
 
+    //권한 계층이 View(html)도 적용 되도록 설정
+    @Override
+    public void init(WebSecurity web) throws Exception {
+        web.expressionHandler(expressionHandler());
+        super.init(web);
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-            .csrf().disable()               //csrf 토큰
-            .authorizeRequests();           //인증 요청
+        http.csrf().disable()              //csrf 토큰
+            .authorizeRequests()           //인증 요청
+            .expressionHandler(expressionHandler());
 
         http.formLogin()                    //폼 로그인 설정
-            .loginPage("/members/login")
-            .loginProcessingUrl("/members/loginProcess")
-            .failureHandler(authenticationFailureHandler())
-            .permitAll();
+                .loginPage("/members/login")
+                .loginProcessingUrl("/members/loginProcess")
+                .failureHandler(authenticationFailureHandler())
+                .permitAll();
 
         http.logout()                       //로그아웃 설정
-            .logoutSuccessUrl("/")
-            .invalidateHttpSession(true);
+                .logoutSuccessUrl("/")
+                .invalidateHttpSession(true);
 
         http.rememberMe()                   //로그인 유지 설정
                 .userDetailsService(memberService)
@@ -56,6 +67,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .rememberMeCookieName("remember-me")
                 .tokenValiditySeconds(86400)
                 .tokenRepository(tokenRepository());
+
+        http.sessionManagement() //세션관리
+                .maximumSessions(1)
+                .expiredUrl("/expired");
+
+        http.exceptionHandling()
+                .accessDeniedPage("/denied");
     }
 
     @Override
@@ -87,5 +105,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         JdbcTokenRepositoryImpl jdbcTokenRepository = new JdbcTokenRepositoryImpl();
         jdbcTokenRepository.setDataSource(dataSource);
         return jdbcTokenRepository;
+    }
+
+    //권한 계층 설정
+    public SecurityExpressionHandler<FilterInvocation> expressionHandler() {
+        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+        roleHierarchy.setHierarchy("ROLE_MASTER > ROLE_ADMIN > ROLE_USER");
+
+        DefaultWebSecurityExpressionHandler handler = new DefaultWebSecurityExpressionHandler();
+        handler.setRoleHierarchy(roleHierarchy);
+
+        return handler;
     }
 }

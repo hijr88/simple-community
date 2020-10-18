@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>존재하지 않는 페이지</title>
+
+    <link rel="stylesheet" href="../../static/css/error.css" th:href="@{/css/error.css}">
+</head>
+
+<body style="margin: 0">
+<div class="over-lay">
+    <div class="content">
+        <div class="img">
+            <img alt="page_not_found" src="../../static/images/page_not_found.jpg" th:src="@{/images/page_not_found.jpg}">
+        </div>
+        <h2>요청하신 페이지가 존재하지 않습니다.</h2>
+        <a th:href="@{/}" class="back-home">돌아가기</a>
+    </div>
+</div>
+</body>
+</html>

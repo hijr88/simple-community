@@ -51,7 +51,7 @@ public class Member extends Address{
     @ColumnDefault("1")
     private Boolean enable;
 
-    @ColumnDefault("ROLE_USER")
+    @ColumnDefault("'ROLE_USER'")
     private String role;
 
     public Member(String username, String password, String nickname, String email,

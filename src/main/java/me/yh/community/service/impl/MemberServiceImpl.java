@@ -2,17 +2,21 @@ package me.yh.community.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import me.yh.community.Utils;
+import me.yh.community.config.security.CustomUser;
 import me.yh.community.entity.Member;
 import me.yh.community.repository.MemberRepository;
 import me.yh.community.service.MailService;
 import me.yh.community.service.MemberService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -23,6 +27,14 @@ public class MemberServiceImpl implements MemberService {
     private final MailService mailService;
     private final PasswordEncoder passwordEncoder;
 
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<Member> findMember = memberRepository.findByUsername(username);
+        if (findMember.isEmpty()) {
+            throw new UsernameNotFoundException("사용자가 입력한 아이디에 해당하는 사용자를 찾을 수 없습니다.");
+        }
+        return new CustomUser(findMember.get());
+    }
 
     @Override
     public boolean sendAuthCodeMail(HttpServletRequest request, String receiveEmail) {

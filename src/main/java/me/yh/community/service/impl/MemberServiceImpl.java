@@ -13,12 +13,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Optional;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class MemberServiceImpl implements MemberService {
 
@@ -78,5 +80,33 @@ public class MemberServiceImpl implements MemberService {
             memberRepository.save(member);
             return true;
         }
+    }
+
+    @Transactional
+    @Override
+    public boolean changeTempPassword(String username, String email) {
+
+        //임시 비밀번호 생성
+        String tempPassword = Utils.createRandomCode();
+
+        Optional<Member> findMember = memberRepository.findByUsername(username);
+        if(findMember.isEmpty())
+            return false;
+
+        Member member = findMember.get();
+        String encodePassword = passwordEncoder.encode(tempPassword);
+        member.changePassword(encodePassword);
+
+        String sb = "<html>" +
+                "<body>" +
+                "    <div style=\"border: 2px solid rgb(77, 194, 125); display: inline-block;padding: 2px 5px;\">" +
+                "    <p>변경된 비밀번호입니다.</p>" +
+                "    <p>비밀번호:  <span style=\"font-size: 1.3rem; color: #1d80fb; font-weight: bold; text-decoration: underline;\">" + tempPassword + "</span></p>" +
+                "    </div>" +
+                "</body>" +
+                "</html>";
+        mailService.sendMail(email, "임시 비밀번호 발급.", sb); //받는사람이메일주소,제목,내용
+
+        return true;
     }
 }

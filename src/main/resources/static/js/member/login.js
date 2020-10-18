@@ -31,8 +31,10 @@ async function findUsername() {
         return;
     }
 
-    const response = await fetch(`find-username?email=${email}`, {
-        headers: {'Content-Type': 'text/plain'}
+    const response = await fetch(`/api/members/find-username`, {
+        headers: {'Content-Type': 'text/plain'},
+        method: 'post',
+        body: email
     });
     if(!response.ok){
         alert('Server Error!!')
@@ -60,8 +62,10 @@ async function findMember() {
         result.textContent = '아이디와 이메일을 입력해주세요.';
         return;
     }
-    const response = await fetch(`find-member?username=${username}&email=${email}`, {
-        headers: {'Content-Type': 'text/plain'}
+    const response = await fetch(`/api/members/find-member`, {
+        headers: {'Content-Type': 'application/json'},
+        method: 'post',
+        body: JSON.stringify({username : username, email : email})
     });
     if(!response.ok){
         alert('Server Error!!')
@@ -98,8 +102,10 @@ async function getNewPassword() {
     const email = info[1].value.trim();
 
     showLoading();
-    const response = await fetch(`change-new-password?username=${username}&email=${email}`, {
-        headers: {'Content-Type': 'text/plain'}
+    const response = await fetch(`/api/members/change-temp-password`, {
+        headers: {'Content-Type': 'application/json'},
+        method: 'post',
+        body: JSON.stringify({username:username, email: email})
     });
     if(!response.ok){
         alert('Server Error!!')

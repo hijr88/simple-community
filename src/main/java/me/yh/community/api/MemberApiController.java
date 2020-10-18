@@ -1,5 +1,6 @@
 package me.yh.community.api;
 
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import me.yh.community.repository.MemberRepository;
 import me.yh.community.service.MemberService;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
@@ -51,16 +53,17 @@ public class MemberApiController {
 
     /**
      * 해당 이메일에 인증코드 전송
+     *
      * @param receiveEmail 이메일
      */
     @PostMapping(value = "/create-code", consumes = "text/plain")
     public ResponseEntity<String> sendSimpleMail(HttpServletRequest request,
-                                 @RequestBody String receiveEmail) throws Exception {
+                                                 @RequestBody String receiveEmail) throws Exception {
         request.setCharacterEncoding("utf-8");
 
         boolean result = memberService.sendAuthCodeMail(request, receiveEmail);
 
-        if(result)
+        if (result)
             return ResponseEntity.ok("1");
         else
             return ResponseEntity.ok("0");
@@ -87,5 +90,55 @@ public class MemberApiController {
             return ResponseEntity.ok("1");
         } else
             return ResponseEntity.ok("0");
+    }
+
+    /**
+     * 로그인 페이지에서 아이디 찾기 기능
+     *
+     * @param email 이메일
+     * @return 이메일에 일치하는 아이디, 없으면 null
+     */
+    @PostMapping(path = "/find-username", consumes = "text/plain")
+    public ResponseEntity<String> findUsername(@RequestBody String email) {
+        Optional<String> username = memberRepository.findUsernameByEmail(email);
+
+        String result = "";
+        if (username.isPresent())
+            result = username.get();
+
+        return ResponseEntity.ok(result);
+    }
+
+    /**
+     * 로그인 페이지에서 비밀번호 찾기 기능
+     *
+     * @param member 아이디 & 이메일
+
+     * @return 아이디와 이메일이 일치하는 회원수 1, 불일치 0
+     */
+    @PostMapping(path = "/find-member", consumes = "application/json")
+    public ResponseEntity<Integer> findMember(@RequestBody MemberUsernameAndEmail member) {
+        int result = memberRepository.countByUsernameAndEmail(member.getUsername(), member.getEmail());
+        return ResponseEntity.ok(result);
+    }
+
+    /**
+     * 로그인 페이지에서 비밀빈호 찾기 후 새로운 비밀번호 발급
+     *
+     * @param member    아이디: 임시 비밀번호로 대체할 아이디 & 이메일: 임시 비밀번호를 받을 이메일
+     */
+    @PostMapping(path = "/change-temp-password", consumes = "application/json")
+    public ResponseEntity<String> changeTempPassword(@RequestBody MemberUsernameAndEmail member) {
+        boolean result = memberService.changeTempPassword(member.getUsername(), member.getEmail());
+        if (result)
+            return ResponseEntity.ok("OK");
+        else
+            return ResponseEntity.ok("FAIL");
+    }
+
+    @Data
+    static class MemberUsernameAndEmail {
+        private String username;
+        private String email;
     }
 }

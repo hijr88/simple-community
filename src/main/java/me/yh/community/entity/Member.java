@@ -66,5 +66,9 @@ public class Member extends Address{
     public void encodePassword(PasswordEncoder passwordEncoder) {
         this.password = passwordEncoder.encode(this.password);
     }
+
+    public void changePassword(String password) {
+        this.password = password;
+    }
 }
 

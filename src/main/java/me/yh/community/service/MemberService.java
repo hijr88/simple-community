@@ -10,4 +10,6 @@ public interface MemberService extends UserDetailsService {
     boolean sendAuthCodeMail(HttpServletRequest request, String receiveEmail);
 
     boolean createNewMember(Member member);
+
+    boolean changeTempPassword(String username, String email);
 }

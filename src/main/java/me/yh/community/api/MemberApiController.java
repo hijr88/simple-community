@@ -8,7 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -134,6 +138,24 @@ public class MemberApiController {
             return ResponseEntity.ok("OK");
         else
             return ResponseEntity.ok("FAIL");
+    }
+
+    /**
+     * 비밀번호 수정 페이지에서 사용
+     *
+     * @param password 사용자가 입력한 비밀번호
+     * @return 1:일치 0:불일치
+     */
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping(value = "/match-password", consumes = "text/plain")
+    public ResponseEntity<String> matchPassword(@RequestBody String password) {
+
+        boolean result = memberService.isMatchPassword(password);
+
+        if (result)
+            return ResponseEntity.ok("1");
+        else
+            return ResponseEntity.ok("0");
     }
 
     @Data

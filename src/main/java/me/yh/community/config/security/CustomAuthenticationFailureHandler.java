@@ -22,14 +22,24 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
                                         AuthenticationException exception) throws IOException {
 
-        String errMsg = "가입하지 않은 아이디이거나, 잘못된 비밀번호입니다.";
+        String badCredentials = "가입하지 않은 아이디이거나, 잘못된 비밀번호입니다.";
+        String disable = "탈퇴한 계정입니다.";
+
         String username = request.getParameter("username");
-        log.info(exception.getMessage());
+
+        String errorType = exception.getMessage();
+        log.info(errorType);
 
         //휘발성
         final FlashMap flashMap = new FlashMap();
         flashMap.put("username", username);
-        flashMap.put("errMsg", errMsg);
+
+        if (errorType.equals("Bad credentials")){
+            flashMap.put("errMsg", badCredentials);
+        } else if (errorType.equals("User is disabled")) {
+            flashMap.put("errMsg", disable);
+        }
+
         final FlashMapManager flashMapManager = new SessionFlashMapManager();
         flashMapManager.saveOutputFlashMap(flashMap, request, response);
 

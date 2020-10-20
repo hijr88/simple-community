@@ -9,13 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -36,7 +37,7 @@ class MemberApiControllerTest {
     void notDuplicatedUsername() throws Exception {
         String username = "woo";
 
-        when(memberRepository.countByUsername(username)).thenReturn(0);
+        given(memberRepository.countByUsername(username)).willReturn(0);
 
         mockMvc.perform(post("/api/members/check-username")
                     .contentType(MediaType.TEXT_PLAIN)
@@ -50,7 +51,7 @@ class MemberApiControllerTest {
     void duplicatedUsername() throws Exception {
         String username = "woo";
 
-        when(memberRepository.countByUsername(username)).thenReturn(1);
+        given(memberRepository.countByUsername(username)).willReturn(1);
 
         mockMvc.perform(post("/api/members/check-username")
                 .contentType(MediaType.TEXT_PLAIN)
@@ -64,7 +65,7 @@ class MemberApiControllerTest {
     void findUsername() throws Exception {
         String username = "woo";
 
-        when(memberRepository.findUsernameByEmail("email")).thenReturn(Optional.of(username));
+        given(memberRepository.findUsernameByEmail("email")).willReturn(Optional.of(username));
 
         mockMvc.perform(post("/api/members/find-username")
                 .contentType(MediaType.TEXT_PLAIN)
@@ -81,12 +82,12 @@ class MemberApiControllerTest {
                 .andExpect(content().string(""));
     }
 
-    @DisplayName("로그인창에서 패스워드 찾기")
+    @DisplayName("로그인창에서 패스워드 찾기 요청")
     @Test
     void findMember() throws Exception {
         String json = "{\"username\" : \"woo\", \"email\" : \"email\"}";
 
-        when(memberRepository.countByUsernameAndEmail("woo","email")).thenReturn(1);
+        given(memberRepository.countByUsernameAndEmail("woo","email")).willReturn(1);
 
         mockMvc.perform(post("/api/members/find-member")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -96,12 +97,12 @@ class MemberApiControllerTest {
                 .andExpect(content().string("1"));
     }
 
-    @DisplayName("로그인창에서 새로운 패스워드 발급")
+    @DisplayName("로그인창에서 새로운 패스워드 요청")
     @Test
     void changeTempPassword() throws Exception {
         String json = "{\"username\" : \"woo\", \"email\" : \"email\"}";
 
-        when(memberService.changeTempPassword("woo","email")).thenReturn(true);
+        given(memberService.changeTempPassword("woo","email")).willReturn(true);
 
         mockMvc.perform(post("/api/members/change-temp-password")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -109,5 +110,21 @@ class MemberApiControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().string("OK"));
+    }
+
+    @DisplayName("패스워드 일치 요청")
+    @WithMockUser
+    @Test
+    void matchPassword() throws Exception {
+        String password = "1234";
+
+        given(memberService.isMatchPassword(password)).willReturn(true);
+
+        mockMvc.perform(post("/api/members/match-password")
+                .contentType(MediaType.TEXT_PLAIN)
+                .content(password))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().string("1"));
     }
 }

@@ -1,6 +1,13 @@
 'use strict'
 
-//닉네임 체크
+let firstImageSrc;
+
+// action이 profile일 경우 프로필 이미지 저장
+if (document.querySelector('form').action.split('/').pop() === 'profile') {
+    firstImageSrc = document.querySelector('#profile-image').src;
+}
+
+//닉네임 유효성 검사
 function validateName(name, errText) {  //닉네임 input, 에러 input
     const regName = /^[0-9a-zA-Z가-힣]{1,8}$/; // 특수문자제외
     if (name.value.length === 0) {
@@ -23,19 +30,22 @@ function fileTrigger() {
     fileButton.click();
 }
 
-function changeName() {
+function changeNickName() {
     if (functionKey.includes(event.keyCode)) return;
     document.querySelector("#apply").classList.remove('disabled');
 }
 
-let singleImageFile = null;
-
+//이미지 파일 유효성 검사
 function changeImageFile(fileButton) {
     const filePath = fileButton.value;
-    if (filePath.length === 0) return;
+    if (filePath.length === 0) {
+        // 원래 이미지로
+        document.querySelector('#profile-image').src = firstImageSrc;
+        return;
+    }
     const file = fileButton.files[0];
     if (file.size > 10485760) {
-        alert('최대 허용 파일 사이즈는 10mb입니다.');
+        alert('최대 허용 파일 사이즈는 10mb 입니다.');
         return;
     }
     const acceptedImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/bmp', 'image/tiff']; //허용가능한 파일 확장자
@@ -45,7 +55,7 @@ function changeImageFile(fileButton) {
     }
     document.querySelector("#delete-button").classList.remove('disabled');  //삭제버튼
     document.querySelector("#isDelete").value = 'false';
-    singleImageFile = file;
+
     const thumbImg = document.querySelector("#profile-image");
     makeThumbnail(file, thumbImg, 160, 160);
 
@@ -56,10 +66,10 @@ function changeImageFile(fileButton) {
 
 function deleteProfileImage(button) {
     if (button.classList.contains('disabled')) return;  //삭제버튼 비활성화일 경우 리턴
-    singleImageFile = null;
+
     document.querySelector("#isDelete").value = 'true';
     const img = document.querySelector("#profile-image");
-    img.src = getRoot() + '/file/thumb/profile/anonymous/none/size?w=160&h=160';
+    img.src = getRoot() + '/files/thumb/profile/anonymous/none?w=160&h=160';
     document.querySelector("#input-file").value = '';
 
     button.classList.remove('btn-outline-danger');
@@ -67,48 +77,34 @@ function deleteProfileImage(button) {
     document.querySelector("#apply").classList.remove('disabled');
 }
 
-//프로필사진 / 닉네임 수정
-function modifyProfile(button) {
-    if (button.classList.contains('disabled')) return; //적용버튼 비활성화일 경우 리턴
-    const formData = new FormData();
-    const name = document.querySelector("#name");
-    const nameErr = document.querySelector(".error-name");
-    if (!validateName(name, nameErr)) return;
+async function modifyMember(form) {
+    if (form.querySelector('#apply').classList.contains('disabled')) return; //비활성화일 경우 리턴
 
-    let isDelete = document.querySelector("#isDelete").value;
+    const type = form.action.split('/').pop();
 
-    formData.append('name', name.value);
-    formData.append("isDelete", isDelete);
-    if (singleImageFile !== null) {
-        formData.append('image', singleImageFile);
+    //프로필 수정
+    if (type === 'profile') {
+        //유효한 닉네임이 아닌 경우
+        const name = document.querySelector("#nickname");
+        const nameErr = document.querySelector(".error-name");
+        if (!validateName(name, nameErr)) return;
+    } else if (type === 'password') {
+        const passwordArray = form.querySelectorAll("input[type=password]");
+        const result = await matchPassword(passwordArray);
+        if (!result) return;
     }
 
-    const xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function () {
-        if (xhttp.readyState === 4) {
-            if (xhttp.status === 200) {
-                let response = this.response;
-                if (response === "1")
-                    location.href = getRoot() + '/member/me'
-                else {
-                    alert('fail..')
-                }
-            }
-        }
-    }
-    xhttp.open("POST", getRoot() + '/member/edit/profile', true);
-    //xhttp.setRequestHeader("Content-type","multipart/form-data");
-    xhttp.send(formData);
+    form.submit();
 }
 
-//비밀번호체크
+//비밀번호 유효성 검사
 function validatePassword(password) {
     return !(password.value.includes(' ') || password.value.length < 4 || password.value.length > 20);
 }
 
-//현재 비밀번호, 새로운 비밀번호, 새로운 비밀번호 확인
-function modifyPassword(passwordArray) {
-    if (passwordArray.length === 0) return true;
+//현재 비밀번호, 새로운 비밀번호, 새로운 비밀번호 일치하는지 확인
+async function matchPassword(passwordArray) {
+
     for (let i = 0; i < 2; i++) {
         if (!validatePassword(passwordArray[i])) {
             passwordArray[i].value = '';
@@ -128,20 +124,19 @@ function modifyPassword(passwordArray) {
         passwordArray[2].focus();
         return false;
     }
-    let response = 0;
-    const xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = () => {
-        if (xhttp.readyState === 4) {
-            if (xhttp.status === 200) {
-                response = xhttp.responseText;
-            } else {
-                alert('password err');
-            }
-        }
+
+    const response = await fetch(getRoot() + `/api/members/match-password`,{
+        method: 'post',
+        headers: {'Content-Type' : 'text/plain'},
+        body: passwordArray[0].value.trim()
+    });
+    if (!response.ok) {
+        alert('Server Error');
+        return;
     }
-    xhttp.open("GET", getRoot() + "/member/checkPassword?password=" + passwordArray[0].value.trim(), false);
-    xhttp.send();
-    if (response === '1') {
+    const text = await response.text();
+
+    if (text === '1') {
         return true;
     } else {
         alert('비밀번호를 정확하게 입력해 주세요.');
@@ -161,38 +156,34 @@ function changeAddress() {
     document.querySelector('#apply').classList.remove('disabled');
 }
 
-function modifyMember(form) {
-    if (form.querySelector('#apply').classList.contains('disabled')) return; //비활성화일 경우 리턴
-
-    const passwordArray = form.querySelectorAll("input[type=password]");
-    if (!modifyPassword(passwordArray)) return;
-
-    form.submit();
-}
-
-async function dropMember() {
+async function dropMember(form) {
     const passwordArray = document.querySelectorAll('input[type=password]');
+
+    if (passwordArray[0].value.length === 0 || passwordArray[1].value.length === 0) {
+        showAlert('info', '비밀번호를 입력하세요.', true);
+        return;
+    }
 
     if (passwordArray[0].value !== passwordArray[1].value) {
         showAlert('info', '비밀번호 확인이 일치하지 않습니다.', true);
         return;
     }
-    const response = await fetch('checkPassword?password=' + passwordArray[0].value.trim());
-    if (response.status === 200) {
-        const rText = await response.text();
-        if (rText === '0') {
-            showAlert('danger', '비밀번호가 일치하지 않습니다.', true);
-        } else {
-            if (confirm('정말 탈퇴하시겠습니까?')) {
-                const rText = await fetch('drop', {
-                    method: 'PUT'
-                }).then(r => r.text());
-                if (rText === '1') {
-                    location.href = `${getRoot()}/index`;
-                }
-            }
-        }
+
+    const response = await fetch(getRoot() + `/api/members/match-password`,{
+        method: 'post',
+        headers: {'Content-Type' : 'text/plain'},
+        body: passwordArray[0].value.trim()
+    });
+    if (!response.ok) {
+        alert('Server Error');
+    }
+    const text = await response.text();
+
+    if (text === '0') {
+        showAlert('danger', '비밀번호가 일치하지 않습니다.', true);
     } else {
-        alert('Error');
+        if (confirm('정말 탈퇴하시겠습니까?')) {
+            form.submit();
+        }
     }
 }

@@ -9,8 +9,8 @@ function foldDaumPostcode() {
 
 function execDaumPostcode() {
     let currentWidth = document.querySelector(".register").offsetWidth;
-    console.dir(document.querySelector(".register"));
-    console.log(currentWidth);
+    //console.dir(document.querySelector(".register"));
+    //console.log(currentWidth);
 
     // 현재 scroll 위치를 저장해놓는다.
     var currentScroll = Math.max(document.body.scrollTop, document.documentElement.scrollTop);
@@ -53,7 +53,7 @@ function execDaumPostcode() {
             }
 
             // 우편번호와 주소 정보를 해당 필드에 넣는다.
-            document.getElementById('zonecode').value = data.zonecode;
+            document.getElementById('zoneCode').value = data.zonecode;
             document.getElementById("address").value = addr;
             // 커서를 상세주소 필드로 이동한다.
             document.getElementById("detailAddress").focus();

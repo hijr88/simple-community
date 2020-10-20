@@ -49,15 +49,15 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <div class="dropdown" th:with="username=${#authentication.principal.username}">
+                            <div class="dropdown" th:with="username=${#authentication.name}, profileImage=${#authentication.principal.profileImage}">
                                 <!-- Trigger -->
                                 <img class="ml-1 rounded-circle d-none d-md-block" width="50" height="50"
                                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                                     th:src="@{|/file/thumb/profile/${username}/profileImage/size(w=50,h=50)|}"
+                                     th:src="@{|/files/thumb/profile/${username}/${profileImage}(w=50,h=50)}"
                                      alt="profile" style="cursor: pointer;"/>
                                 <!-- Menu -->
                                 <div class="dropdown-menu dropdown-menu-right">
-                                    <a class="dropdown-item" th:href="@{${username}/member/me}">
+                                    <a class="dropdown-item" th:href="@{/members/me}">
                                         <i class="fas fa-user pr-1"></i>내정보
                                     </a>
                                     <a class="dropdown-item" th:href="@{/logout}">

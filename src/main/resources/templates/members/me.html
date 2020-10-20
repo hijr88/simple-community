@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <title>내 정보 | YH</title>
+</head>
+
+<main layout:fragment="content" class="container mb-3 clearfix">
+    <section class="row">
+        <div class="col-md-6 my-2 p-0 px-2">
+            <div class="card h-100">
+                <div class="card-header">프로필사진 / 닉네임</div>
+                <div class="card-body">
+                    <a target="_blank" th:href="@{|/files/thum/profile/${m.username}/${m.profileImage}}"
+                       style="text-decoration: none">
+                        <img class="border rounded-circle"
+                             th:src="@{|/files/thumb/profile/${m.username}/${#authentication.principal.profileImage}(w=60,h=60)}"
+                             alt="프로필사진" width="60" height="60">
+                    </a>
+                    <div class="d-inline-block ml-5">
+                        <strong>닉네임</strong><span class="ml-2" th:text="${m.nickname}">닉네임</span>
+                    </div>
+                </div>
+                <div class="card-footer bg-white">
+                    <a th:href="@{edit/profile}" class="btn btn-outline-primary">수정하기</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 my-2 p-0 px-2">
+            <div class="card h-100">
+                <div class="card-header">아이디 / 이메일 / 가입일</div>
+                <div class="card-body">
+                    <div>
+                        <strong class="w-25 d-inline-block">아이디</strong><span class="ml-2" th:text="${m.username}">아이디</span><br><br>
+                    </div>
+                    <div>
+                        <strong class="w-25 d-inline-block">이메일</strong><span class="ml-2" th:text="${m.email}">이메일</span><br><br>
+                    </div>
+                    <div>
+                        <strong class="w-25 d-inline-block">가입일</strong><span class="ml-2" th:text="${#temporals.format(m.createDate)}">이메일</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 my-2 p-0 px-2">
+            <div class="card h-100">
+                <div class="card-header">비밀번호</div>
+                <div class="card-body">
+                    <div>
+                        <strong class="w-25 d-inline-block">비밀번호</strong><span class="ml-2">암호화 되어 있습니다.</span><br><br>
+                    </div>
+                </div>
+                <div class="card-footer bg-white">
+                    <a th:href="@{edit/password}" class="btn btn-outline-primary">수정하기</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 my-2 p-0 px-2">
+            <div class="card h-100">
+                <div class="card-header">주소</div>
+                <div class="card-body">
+                    <div>
+                        <strong class="w-25 d-inline-block">우편번호</strong><span class="ml-2" th:text="${m.zoneCode}"></span><br><br>
+                    </div>
+                    <div>
+                        <p><strong class="w-25 d-inline-block">도로명</strong><span class="ml-2" th:text="${m.address}"></span></p>
+                    </div>
+                    <div>
+                        <strong class="w-25 d-inline-block">주소</strong><span class="ml-2" th:text="${m.detailAddress}"></span>
+                    </div>
+                </div>
+                <div class="card-footer bg-white">
+                    <a th:href="@{edit/address}" class="btn btn-outline-primary">수정하기</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <a sec:authorize="!hasRole('MASTER')" th:href="@{drop}" class="btn btn-sm btn-danger d-block">회원탈퇴</a>
+</main>
+
+</html>

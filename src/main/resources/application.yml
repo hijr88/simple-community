@@ -4,6 +4,12 @@ spring:
 ---
 spring:
   profiles: default
+  servlet:
+    multipart:
+      location: C:\upload
+      max-file-size: 10MB
+      max-request-size: 50MB
+
   datasource:
     url: jdbc:postgresql://192.168.99.100:5432/community
     username: woo
@@ -26,6 +32,11 @@ logging.level:
     hibernate:
       SQL: debug
       type.descriptor.sql.BasicBinder: trace
+
+server:
+  error:
+    include-exception: true
+    include-stacktrace: always
 ---
 spring:
   profiles: test

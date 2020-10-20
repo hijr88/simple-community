@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <title>탈퇴</title>
+</head>
+
+<main layout:fragment="content" class="container my-3">
+    <h4>회원 탈퇴</h4>
+
+    <section class="my-3">
+        <form th:action="@{/members/drop}" method="post">
+            <div class="justify-content-center">
+                <div class="row justify-content-md-center">
+                    <input type="password" class="form-control col-md-7 mb-3" autocomplete="new-password"
+                           placeholder="비밀번호">
+                    <input type="password" class="form-control col-md-7" autocomplete="new-password" placeholder="비밀번호 확인">
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <button type="button" id="apply" class="btn btn-success mr-3" onclick="dropMember(this.form);">탈퇴하기</button>
+                <a th:href="@{/member/me}" class="btn btn-danger mx-3">취소</a>
+            </div>
+        </form>
+    </section>
+</main>
+<th:block layout:fragment="src">
+<script th:src="@{/js/commons.js}"></script>
+<script th:src="@{/js/member/modify.js}"></script>
+<!-- 다음 주소 API -->
+</th:block>
+</html>

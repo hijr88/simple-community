@@ -47,13 +47,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()              //csrf 토큰
-            .authorizeRequests()           //인증 요청
-            .expressionHandler(expressionHandler());
+        http
+                .csrf().disable()              //csrf 토큰
+                .authorizeRequests()           //인증 요청
+                .expressionHandler(expressionHandler());
+
 
         http.formLogin()                    //폼 로그인 설정
                 .loginPage("/members/login")
-                .loginProcessingUrl("/members/loginProcess")
+                .loginProcessingUrl("/members/login-process")
                 .failureHandler(authenticationFailureHandler())
                 .permitAll();
 
@@ -72,7 +74,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .maximumSessions(1)
                 .expiredUrl("/expired");
 
-        http.exceptionHandling()
+        http.exceptionHandling()    //에러 핸들러
                 .accessDeniedPage("/denied");
     }
 
@@ -109,12 +111,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     //권한 계층 설정
     public SecurityExpressionHandler<FilterInvocation> expressionHandler() {
-        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-        roleHierarchy.setHierarchy("ROLE_MASTER > ROLE_ADMIN > ROLE_USER");
-
         DefaultWebSecurityExpressionHandler handler = new DefaultWebSecurityExpressionHandler();
-        handler.setRoleHierarchy(roleHierarchy);
+        handler.setRoleHierarchy(roleHierarchy());
 
         return handler;
+    }
+
+    @Bean
+    public RoleHierarchyImpl roleHierarchy() {
+        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+        roleHierarchy.setHierarchy("ROLE_MASTER > ROLE_ADMIN > ROLE_USER");
+        return roleHierarchy;
     }
 }

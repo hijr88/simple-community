@@ -1,7 +1,7 @@
 'use strict'
 
 function getRoot() {
-    return "/web";
+    return "";
 }
 
 function notAllowEnter() {

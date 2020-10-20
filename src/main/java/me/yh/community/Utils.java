@@ -4,6 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ui.Model;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
 public class Utils {
@@ -37,5 +40,9 @@ public class Utils {
     public static void redirectErrorPage(Model model, String msg, String redirect) {
         model.addAttribute("msg", msg);
         model.addAttribute("redirect", redirect);
+    }
+
+    public static String urlEncode(String s) {
+        return URLEncoder.encode(s, StandardCharsets.UTF_8).replace("+", "%20");
     }
 }

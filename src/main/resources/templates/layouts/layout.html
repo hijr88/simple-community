@@ -18,8 +18,9 @@
     <link rel="stylesheet" th:href="@{/css/gallery.css}">
 </head>
 <body>
-    <header th:replace="fragments/header :: headerFragment"></header>
-    <main layout:fragment="content"></main>
-    <footer th:replace="fragments/footer :: footerFragment"></footer>
+<header th:replace="fragments/header :: headerFragment"></header>
+<main layout:fragment="content"></main>
+<footer th:replace="fragments/footer :: footerFragment"></footer>
+<th:block layout:fragment="src"></th:block>
 </body>
 </html>

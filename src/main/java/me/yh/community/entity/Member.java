@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @DynamicInsert                      //null 값은 insert 할 때 제외
+@DynamicUpdate
 @SequenceGenerator(
         name="member_seq_gen",      //시퀀스 제너레이터 이름
         sequenceName="member_seq",  //시퀀스 이름
@@ -46,6 +48,7 @@ public class Member extends Address{
     private LocalDateTime createDate;
 
     @Column(length = 500)
+    @ColumnDefault("'none'")
     private String profileImage;
 
     @ColumnDefault("1")
@@ -67,8 +70,17 @@ public class Member extends Address{
         this.password = passwordEncoder.encode(this.password);
     }
 
+    public void changeProfile(String nickname, String profileImage) {
+        this.nickname = nickname;
+        this.profileImage = profileImage;
+    }
+
     public void changePassword(String password) {
         this.password = password;
+    }
+
+    public void disable() {
+        this.enable = false;
     }
 }
 

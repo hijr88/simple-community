@@ -40,6 +40,8 @@ public class HomeController {
                 Utils.redirectErrorPage(model, "회원정보 추가에 실패하였습니다.\\n아이디나 이메일이 중복입니다.", "/index");break;
             case "FAIL_BINDING":
                 Utils.redirectErrorPage(model, "잘못된 값이 입력 되었습니다.", "/index");break;
+            case "FAIL_MODIFY_MEMBER":
+                Utils.redirectErrorPage(model, "회원 수정을 실패하였습니다.","/members/me");break;
         }
         return "error/error-redirect";
     }

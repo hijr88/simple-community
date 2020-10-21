@@ -13,10 +13,10 @@
             <div class="card h-100">
                 <div class="card-header">프로필사진 / 닉네임</div>
                 <div class="card-body">
-                    <a target="_blank" th:href="@{|/files/thum/profile/${m.username}/${m.profileImage}}"
+                    <a target="_blank" th:href="@{|/files/thum/profile/${m.id}/${m.profileImage}}"
                        style="text-decoration: none">
                         <img class="border rounded-circle"
-                             th:src="@{|/files/thumb/profile/${m.username}/${#authentication.principal.profileImage}(w=60,h=60)}"
+                             th:src="@{|/files/thumb/profile/${m.id}/${#authentication.principal.profileImage}(w=60,h=60)}"
                              alt="프로필사진" width="60" height="60">
                     </a>
                     <div class="d-inline-block ml-5">
@@ -33,7 +33,7 @@
                 <div class="card-header">아이디 / 이메일 / 가입일</div>
                 <div class="card-body">
                     <div>
-                        <strong class="w-25 d-inline-block">아이디</strong><span class="ml-2" th:text="${m.username}">아이디</span><br><br>
+                        <strong class="w-25 d-inline-block">아이디</strong><span class="ml-2" th:text="${m.id}">아이디</span><br><br>
                     </div>
                     <div>
                         <strong class="w-25 d-inline-block">이메일</strong><span class="ml-2" th:text="${m.email}">이메일</span><br><br>

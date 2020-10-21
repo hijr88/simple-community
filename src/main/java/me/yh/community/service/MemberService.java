@@ -12,7 +12,7 @@ public interface MemberService extends UserDetailsService {
 
     boolean createNewMember(Member member);
 
-    boolean changeTempPassword(String username, String email);
+    boolean changeTempPassword(String id, String email);
 
     boolean changeProfile(Member editMember, MultipartFile mf, boolean isDelete);
 

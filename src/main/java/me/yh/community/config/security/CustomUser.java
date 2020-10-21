@@ -12,7 +12,7 @@ public class CustomUser extends User {
     private String profileImage;
 
     public CustomUser(Member member) {
-        super(member.getUsername(), member.getPassword(), member.getEnable(), true, true, true,
+        super(member.getId(), member.getPassword(), member.getEnable(), true, true, true,
                 List.of(new SimpleGrantedAuthority(member.getRole())));
         this.profileImage = Utils.urlEncode(member.getProfileImage());
     }

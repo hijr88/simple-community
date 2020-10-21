@@ -15,12 +15,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(MemberApiController.class)
@@ -37,7 +37,7 @@ class MemberApiControllerTest {
     void notDuplicatedUsername() throws Exception {
         String username = "woo";
 
-        given(memberRepository.countByUsername(username)).willReturn(0);
+        given(memberRepository.countById(username)).willReturn(0);
 
         mockMvc.perform(post("/api/members/check-username")
                     .contentType(MediaType.TEXT_PLAIN)
@@ -51,7 +51,7 @@ class MemberApiControllerTest {
     void duplicatedUsername() throws Exception {
         String username = "woo";
 
-        given(memberRepository.countByUsername(username)).willReturn(1);
+        given(memberRepository.countById(username)).willReturn(1);
 
         mockMvc.perform(post("/api/members/check-username")
                 .contentType(MediaType.TEXT_PLAIN)
@@ -65,7 +65,7 @@ class MemberApiControllerTest {
     void findUsername() throws Exception {
         String username = "woo";
 
-        given(memberRepository.findUsernameByEmail("email")).willReturn(Optional.of(username));
+        given(memberRepository.findIdByEmail("email")).willReturn(Optional.of(username));
 
         mockMvc.perform(post("/api/members/find-username")
                 .contentType(MediaType.TEXT_PLAIN)
@@ -87,7 +87,7 @@ class MemberApiControllerTest {
     void findMember() throws Exception {
         String json = "{\"username\" : \"woo\", \"email\" : \"email\"}";
 
-        given(memberRepository.countByUsernameAndEmail("woo","email")).willReturn(1);
+        given(memberRepository.countByIdAndEmail("woo","email")).willReturn(1);
 
         mockMvc.perform(post("/api/members/find-member")
                 .contentType(MediaType.APPLICATION_JSON)

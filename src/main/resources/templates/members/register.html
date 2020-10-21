@@ -26,7 +26,7 @@
     <h2 class="">회원가입</h2>
 
     <form action="new" method="POST" onsubmit="return addMember(this);">
-        <input type="hidden" id="username-check" value="N">     <!--/*아이디중복확인 */-->
+        <input type="hidden" id="id-check" value="N">     <!--/*아이디중복확인 */-->
         <input type="hidden" id="email-check" value="N">        <!--/*이메일중복확인 */-->
         <input type="hidden" id="is-new-code" value="N">        <!--/*인증번호를 받았는지*/-->
         <input type="hidden" id="code-check" value="N">         <!--/*이메일인증확인 */-->
@@ -38,12 +38,12 @@
                     <span class="input-group-text"><i class="fas fa-address-card"></i></span>
                 </div>
                 <input type="text" class="form-control" placeholder="아이디 (공백제외 4~12자의 영문 소문자, 숫자)"
-                       name="username" autocomplete="off" onkeyup="resetUsername();">
+                       name="id" autocomplete="off" onkeyup="resetId();">
                 <div class="input-group-append">
-                    <button type="button" class="input-group-text check-username" onclick="isDuplicatedUsername();">중복확인</button>
+                    <button type="button" class="input-group-text check-id" onclick="isDuplicatedId();">중복확인</button>
                 </div>
             </div>
-            <span class="error-username small"></span>
+            <span class="error-id small"></span>
         </div>
 
         <div class="PASSWORD">

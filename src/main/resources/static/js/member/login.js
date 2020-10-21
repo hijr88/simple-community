@@ -9,8 +9,8 @@ function errTextInit() {
 
 function validateLogin(form) {
     //4~12  //4~20
-    if (form.username.value.length === 0) {
-        document.querySelector('.error-username').textContent = '아이디를 입력해주세요.';
+    if (form.id.value.length === 0) {
+        document.querySelector('.error-id').textContent = '아이디를 입력해주세요.';
         return false;
     }
     if (form.password.value.length === 0) {
@@ -21,8 +21,8 @@ function validateLogin(form) {
 }
 
 //아이디 찾기
-async function findUsername() {
-    const result = document.querySelector('#find-username-result');
+async function findId() {
+    const result = document.querySelector('#find-id-result');
     const email = document.querySelector('#input-email').value.trim();
 
     if (email.length === 0) {
@@ -31,7 +31,7 @@ async function findUsername() {
         return;
     }
 
-    const response = await fetch(getRoot() + `/api/members/find-username`, {
+    const response = await fetch(getRoot() + `/api/members/find-id`, {
         headers: {'Content-Type': 'text/plain'},
         method: 'post',
         body: email
@@ -54,10 +54,10 @@ async function findUsername() {
 async function findMember() {
     const result = document.querySelector('#find-member-result');
     const info = document.querySelectorAll('#find-member input');
-    const username = info[0].value.trim();
+    const id = info[0].value.trim();
     const email = info[1].value.trim();
 
-    if (username.length === 0 || email.length === 0) {
+    if (id.length === 0 || email.length === 0) {
         result.style.color = '#FF0000';
         result.textContent = '아이디와 이메일을 입력해주세요.';
         return;
@@ -65,7 +65,7 @@ async function findMember() {
     const response = await fetch(getRoot() + `/api/members/find-member`, {
         headers: {'Content-Type': 'application/json'},
         method: 'post',
-        body: JSON.stringify({username : username, email : email})
+        body: JSON.stringify({id : id, email : email})
     });
     if(!response.ok){
         alert('Server Error!!')
@@ -81,8 +81,8 @@ async function findMember() {
     }
 }
 
-$('#find-username').on('hidden.bs.modal', function () {
-    const result = document.querySelector('#find-username-result');
+$('#find-id').on('hidden.bs.modal', function () {
+    const result = document.querySelector('#find-id-result');
     const email = document.querySelector('#input-email');
     result.textContent = '';
     email.value = '';
@@ -98,14 +98,14 @@ $('#find-member').on('hidden.bs.modal', function () {
 
 async function getNewPassword() {
     const info = document.querySelectorAll('#find-member input');
-    const username = info[0].value.trim();
+    const id = info[0].value.trim();
     const email = info[1].value.trim();
 
     showLoading();
     const response = await fetch(getRoot() + `/api/members/change-temp-password`, {
         headers: {'Content-Type': 'application/json'},
         method: 'post',
-        body: JSON.stringify({username:username, email: email})
+        body: JSON.stringify({id:id, email: email})
     });
     if(!response.ok){
         alert('Server Error!!')

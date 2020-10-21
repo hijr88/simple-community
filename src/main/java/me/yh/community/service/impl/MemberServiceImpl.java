@@ -36,7 +36,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<Member> findMember = memberRepository.findByUsername(username);
+        Optional<Member> findMember = memberRepository.findById(username);
         if (findMember.isEmpty()) {
             throw new UsernameNotFoundException("사용자가 입력한 아이디에 해당하는 사용자를 찾을 수 없습니다.");
         }
@@ -72,9 +72,10 @@ public class MemberServiceImpl implements MemberService {
     /**
      *  회원가입을 진행하기 전에 한 번 더 중복되는지 확인한다.
      */
+    @Transactional
     @Override
     public boolean createNewMember(Member member) {
-        int result = memberRepository.countByUsernameOrEmail(member.getUsername(), member.getEmail());
+        int result = memberRepository.countByIdOrEmail(member.getId(), member.getEmail());
 
         if (result == 1) {
             return false;
@@ -89,12 +90,12 @@ public class MemberServiceImpl implements MemberService {
 
     @Transactional
     @Override
-    public boolean changeTempPassword(String username, String email) {
+    public boolean changeTempPassword(String id, String email) {
 
         //임시 비밀번호 생성
         String tempPassword = Utils.createRandomCode();
 
-        Optional<Member> findMember = memberRepository.findByUsername(username);
+        Optional<Member> findMember = memberRepository.findById(id);
         if(findMember.isEmpty())
             return false;
 
@@ -120,9 +121,9 @@ public class MemberServiceImpl implements MemberService {
     public boolean changeProfile(Member editMember, MultipartFile mf, boolean isDelete) {
         CustomUser customUser = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        String username = customUser.getUsername();
+        String id = customUser.getUsername();
 
-        Optional<Member> findMember = memberRepository.findByUsername(username);
+        Optional<Member> findMember = memberRepository.findById(id);
         Member member;
 
         if (findMember.isPresent())
@@ -131,7 +132,7 @@ public class MemberServiceImpl implements MemberService {
             return false;
         }
 
-        String folderPath = FileService.profilePath + File.separator + username;
+        String folderPath = FileService.profilePath + File.separator + id;
         String filePath   = folderPath + File.separator + member.getProfileImage();
 
         // 1. 파일 삭제
@@ -209,7 +210,7 @@ public class MemberServiceImpl implements MemberService {
         CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         //회원 정보 가져오기
-        Optional<Member> findMember = memberRepository.findByUsername(user.getUsername());
+        Optional<Member> findMember = memberRepository.findById(user.getUsername());
         //회원 정보 없으면 false
         if (findMember.isEmpty()) return null;
 

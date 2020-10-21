@@ -3,47 +3,47 @@
 notAllowEnter();
 
 //아이디체크
-function isDuplicatedUsername() {
-    const username = document.querySelector("input[name=username]");
-    const error = document.querySelector(".error-username");
+function isDuplicatedId() {
+    const id = document.querySelector("input[name=id]");
+    const error = document.querySelector(".error-id");
 
     //아이디 유효성체크
-    const regUsername = /^[a-z0-9]{4,12}$/;
-    if (!regUsername.test(username.value)) {
+    const regId = /^[a-z0-9]{4,12}$/;
+    if (!regId.test(id.value)) {
         error.textContent = '아이디는 공백제외 4~12자의 영문 소문자, 숫자만 사용 가능합니다.';
         error.style.color = 'red';
-        username.focus();
+        id.focus();
         return;
     }
 
     //아이디중복체크
-    fetch('/api/members/check-username', {
+    fetch('/api/members/check-id', {
         headers: {'Content-Type': 'text/plain'},
         method: 'post',
-        body: username.value.trim()
+        body: id.value.trim()
     })
     .then(response => {
         if (response.status === 200) {
             error.textContent = '사용 가능한 아이디입니다.';
             error.style.color = 'blue';
-            document.querySelector("#username-check").value = 'Y';
+            document.querySelector("#id-check").value = 'Y';
         } else if (response.status === 409) {
             error.textContent = '중복된 아이디입니다.';
             error.style.color = 'red';
-            document.querySelector("#username-check").value = 'N';
+            document.querySelector("#id-check").value = 'N';
         } else {
-            alert('username, server error');
+            alert('id, server error');
         }
     });
 }
 
 //중복확인을 거쳤지만 다시 아이디가 변경된경우
-function resetUsername() {
-    if (document.querySelector("#username-check").value === 'Y') {
+function resetId() {
+    if (document.querySelector("#id-check").value === 'Y') {
         if (functionKey.includes(event.keyCode)) return;
         alert('아이디가 변경되었습니다.\n중복확인을 다시 해주세요.');
-        document.querySelector("#username-check").value = 'N';
-        document.querySelector(".error-username").textContent = '';
+        document.querySelector("#id-check").value = 'N';
+        document.querySelector(".error-id").textContent = '';
     }
 }
 
@@ -209,9 +209,9 @@ function sendCode() {
 function addMember(form) {
     if (functionKey.includes(event.keyCode)) return false;
     //아이디 체크
-    if (form.querySelector("#username-check").value === 'N') {
+    if (form.querySelector("#id-check").value === 'N') {
         alert('아이디를 확인하세요.');
-        form.querySelector("input[name=username]").focus();
+        form.querySelector("input[name=id]").focus();
         return false;
     }
     //비밀번호 체크

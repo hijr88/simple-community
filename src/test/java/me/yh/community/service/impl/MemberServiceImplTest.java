@@ -46,7 +46,7 @@ class MemberServiceImplTest {
         //Member member = new Member("woo","1234","nick","email",null,null,null,null);
 
         //given
-        given(memberRepository.countByUsernameOrEmail(member.getUsername(), member.getEmail())).willReturn(1);
+        given(memberRepository.countByIdOrEmail(member.getId(), member.getEmail())).willReturn(1);
 
         //when
         boolean result = memberService.createNewMember(member);

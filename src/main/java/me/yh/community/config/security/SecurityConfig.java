@@ -56,6 +56,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.formLogin()                    //폼 로그인 설정
                 .loginPage("/members/login")
                 .loginProcessingUrl("/members/login-process")
+                .usernameParameter("id")
                 .failureHandler(authenticationFailureHandler())
                 .permitAll();
 

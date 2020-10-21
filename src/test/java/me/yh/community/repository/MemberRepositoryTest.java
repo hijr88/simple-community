@@ -1,23 +1,21 @@
 package me.yh.community.repository;
 
+import me.yh.community.config.JpaAuditingConfiguration;
 import me.yh.community.entity.Member;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.springframework.context.annotation.Import;
 
 import javax.persistence.EntityManager;
 import java.util.Optional;
 
-@Rollback(value = false)
-@ExtendWith(SpringExtension.class)
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @DataJpaTest
+@Import(JpaAuditingConfiguration.class)
 class MemberRepositoryTest {
 
     @Autowired
@@ -41,31 +39,31 @@ class MemberRepositoryTest {
     @Test
     void CURD() {
 
-        int countByUsername = memberRepository.countByUsername("woo");
-        assertEquals(1, countByUsername);
+        int countById = memberRepository.countById("woo");
+        assertEquals(1, countById);
 
         int countByEmail = memberRepository.countByEmail("abg");
         assertEquals(0, countByEmail);
 
-        Optional<Member> findByUsername = memberRepository.findByUsername("woo");
-        assertTrue(findByUsername.isPresent());
+        Optional<Member> findById = memberRepository.findById("woo");
+        assertTrue(findById.isPresent());
     }
 
     @Test
-    void findUsernameByEmail() {
-        Optional<String> usernameByEmail = memberRepository.findUsernameByEmail("abc@aaa");
+    void findIdByEmail() {
+        Optional<String> usernameByEmail = memberRepository.findIdByEmail("abc@aaa");
         assertTrue(usernameByEmail.isPresent());
 
-        Optional<String> usernameByEmail2 = memberRepository.findUsernameByEmail("abc@aac");
+        Optional<String> usernameByEmail2 = memberRepository.findIdByEmail("abc@aac");
         assertTrue(usernameByEmail2.isEmpty());
     }
 
     @Test
-    void countByUsernameAndEmail() {
-        int count = memberRepository.countByUsernameAndEmail("woo", "abc@aaa");
+    void countByIdAndEmail() {
+        int count = memberRepository.countByIdAndEmail("woo", "abc@aaa");
         assertEquals(1, count);
 
-        int count2 = memberRepository.countByUsernameAndEmail("woo", "abc@aac");
+        int count2 = memberRepository.countByIdAndEmail("woo", "abc@aac");
         assertEquals(0, count2);
     }
 }

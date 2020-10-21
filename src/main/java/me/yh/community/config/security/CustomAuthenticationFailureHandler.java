@@ -25,14 +25,14 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
         String badCredentials = "가입하지 않은 아이디이거나, 잘못된 비밀번호입니다.";
         String disable = "탈퇴한 계정입니다.";
 
-        String username = request.getParameter("username");
+        String id = request.getParameter("id");
 
         String errorType = exception.getMessage();
         log.info(errorType);
 
         //휘발성
         final FlashMap flashMap = new FlashMap();
-        flashMap.put("username", username);
+        flashMap.put("id", id);
 
         if (errorType.equals("Bad credentials")){
             flashMap.put("errMsg", badCredentials);

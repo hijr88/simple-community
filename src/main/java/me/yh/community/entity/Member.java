@@ -7,6 +7,9 @@ import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
@@ -16,24 +19,16 @@ import java.time.LocalDateTime;
 @Getter
 @ToString(callSuper = true)
 
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 @DynamicInsert                      //null 값은 insert 할 때 제외
 @DynamicUpdate
-@SequenceGenerator(
-        name="member_seq_gen",      //시퀀스 제너레이터 이름
-        sequenceName="member_seq",  //시퀀스 이름
-        initialValue=1,             //시작값
-        allocationSize=1            //메모리를 통해 할당할 범위 사이즈
-)
-public class Member extends Address{
 
-    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE,
-                        generator = "member_seq_gen")
-    @Column(name = "member_id")
-    private Long id;
+public class Member extends Address implements Persistable<String > {
 
-    @Column(length = 50, nullable = false, unique = true, updatable = false)
-    private String username;
+    @Id
+    @Column(length = 50, name = "member_id", updatable = false)
+    private String id;
 
     @Column(length = 100, nullable = false)
     private String password;
@@ -44,6 +39,7 @@ public class Member extends Address{
     @Column(length = 300, nullable = false, unique = true, updatable = false)
     private String email;
 
+    @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createDate;
 
@@ -57,10 +53,15 @@ public class Member extends Address{
     @ColumnDefault("'ROLE_USER'")
     private String role;
 
-    public Member(String username, String password, String nickname, String email,
+    @Override
+    public boolean isNew() {
+        return createDate == null;
+    }
+
+    public Member(String id, String password, String nickname, String email,
                   String zoneCode, String address, String extraAddress, String detailAddress) {
         super(zoneCode, address, extraAddress, detailAddress);
-        this.username = username;
+        this.id = id;
         this.password = password;
         this.nickname = nickname;
         this.email = email;

@@ -28,13 +28,12 @@ public class MemberApiController {
     private final MemberService memberService;
 
     /**
-     * @param username 유저 아이디
+     * @param id 유저 아이디
      * @return OK: 사용가능한 아이디, CONFLICT: 중복된 아이디
      */
-    @PostMapping(value = "/check-username", consumes = "text/plain")
-    public ResponseEntity<Void> isDuplicatedUsername(@RequestBody String username) {
-        log.info("아이디 중복검사: '{}'", username);
-        int result = memberRepository.countByUsername(username);
+    @PostMapping(value = "/check-id", consumes = "text/plain")
+    public ResponseEntity<Void> isDuplicatedId(@RequestBody String id) {
+        int result = memberRepository.countById(id);
         if (result == 0)
             return new ResponseEntity<>(HttpStatus.OK);
         else
@@ -47,7 +46,6 @@ public class MemberApiController {
      */
     @PostMapping(path = "/check-email", consumes = "text/plain")
     public ResponseEntity<Void> isDuplicatedEmail(@RequestBody String email) {
-        log.info("이메일 중복검사: '{}'", email);
         int result = memberRepository.countByEmail(email);
         if (result == 0)
             return new ResponseEntity<>(HttpStatus.OK);
@@ -102,13 +100,13 @@ public class MemberApiController {
      * @param email 이메일
      * @return 이메일에 일치하는 아이디, 없으면 null
      */
-    @PostMapping(path = "/find-username", consumes = "text/plain")
-    public ResponseEntity<String> findUsername(@RequestBody String email) {
-        Optional<String> username = memberRepository.findUsernameByEmail(email);
+    @PostMapping(path = "/find-id", consumes = "text/plain")
+    public ResponseEntity<String> findId(@RequestBody String email) {
+        Optional<String> id = memberRepository.findIdByEmail(email);
 
         String result = "";
-        if (username.isPresent())
-            result = username.get();
+        if (id.isPresent())
+            result = id.get();
 
         return ResponseEntity.ok(result);
     }
@@ -121,8 +119,8 @@ public class MemberApiController {
      * @return 아이디와 이메일이 일치하는 회원수 1, 불일치 0
      */
     @PostMapping(path = "/find-member", consumes = "application/json")
-    public ResponseEntity<Integer> findMember(@RequestBody MemberUsernameAndEmail member) {
-        int result = memberRepository.countByUsernameAndEmail(member.getUsername(), member.getEmail());
+    public ResponseEntity<Integer> findMember(@RequestBody MemberIdAndEmail member) {
+        int result = memberRepository.countByIdAndEmail(member.getId(), member.getEmail());
         return ResponseEntity.ok(result);
     }
 
@@ -132,8 +130,8 @@ public class MemberApiController {
      * @param member    아이디: 임시 비밀번호로 대체할 아이디 & 이메일: 임시 비밀번호를 받을 이메일
      */
     @PostMapping(path = "/change-temp-password", consumes = "application/json")
-    public ResponseEntity<String> changeTempPassword(@RequestBody MemberUsernameAndEmail member) {
-        boolean result = memberService.changeTempPassword(member.getUsername(), member.getEmail());
+    public ResponseEntity<String> changeTempPassword(@RequestBody MemberIdAndEmail member) {
+        boolean result = memberService.changeTempPassword(member.getId(), member.getEmail());
         if (result)
             return ResponseEntity.ok("OK");
         else
@@ -159,8 +157,8 @@ public class MemberApiController {
     }
 
     @Data
-    static class MemberUsernameAndEmail {
-        private String username;
+    static class MemberIdAndEmail {
+        private String id;
         private String email;
     }
 }

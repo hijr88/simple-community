@@ -82,7 +82,7 @@ public class MemberController {
     @GetMapping("/me")
     public String me(Principal principal, Model model) {
 
-        Optional<Member> findMember = memberRepository.findByUsername(principal.getName());
+        Optional<Member> findMember = memberRepository.findById(principal.getName());
         findMember.ifPresent( member -> model.addAttribute("m",member));
         return "members/me";
     }
@@ -97,7 +97,7 @@ public class MemberController {
     @GetMapping("/edit/{type}")
     public String  editProfile(Model model, Principal principal, @PathVariable("type") String type) {
 
-        Optional<Member> findMember = memberRepository.findByUsername(principal.getName());
+        Optional<Member> findMember = memberRepository.findById(principal.getName());
         findMember.ifPresent( member -> model.addAttribute("m",member));
 
         model.addAttribute("type",type);

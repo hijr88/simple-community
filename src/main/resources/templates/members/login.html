@@ -24,11 +24,11 @@
             <fieldset>
                 <legend class="text-center">Login</legend>
                 <div>
-                    <input class="form-control my-1" type="text" placeholder="아이디" name="username" autocomplete="off"
-                           th:value="${username}"
+                    <input class="form-control my-1" type="text" placeholder="아이디" name="id" autocomplete="off"
+                           th:value="${id}"
                            autofocus onkeydown="errTextInit();">
                     <!--minlen4 maxlen12 required-->
-                    <span class="error-username small"></span>
+                    <span class="error-id small"></span>
                 </div>
 
                 <div>
@@ -49,7 +49,7 @@
 
                 <div class=" small mt-2">
                     <div class="float-left action">
-                        <span class="text-muted" data-toggle="modal" data-target="#find-username"><i
+                        <span class="text-muted" data-toggle="modal" data-target="#find-id"><i
                                 class="fas fa-user-lock pr-1"></i>아이디</span>
                         <span class="text-muted" data-toggle="modal" data-target="#find-member"><i
                                 class="fas fa-circle pr-1"></i>비밀번호찾기</span>
@@ -65,7 +65,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="find-username" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="find-id" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -80,10 +80,10 @@
                     <input type="email" class="form-control" id="input-email" placeholder="이메일">
                 </div>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
-                <button type="button" class="btn btn-primary" onclick="findUsername();">확인</button>
+                <button type="button" class="btn btn-primary" onclick="findId();">확인</button>
             </div>
             <div class="modal-footer">
-                <p id="find-username-result" style="font-weight: 600"></p>
+                <p id="find-id-result" style="font-weight: 600"></p>
             </div>
         </div>
     </div>

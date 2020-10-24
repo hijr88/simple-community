@@ -1,5 +1,6 @@
 package me.yh.community.controller;
 
+import me.yh.community.security.WithMockCustomUser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +32,7 @@ class HomeControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockCustomUser
     @DisplayName("인증된 상태에서 접근 가능한지")
     void principal_success() throws Exception {
         mockMvc.perform(get("/pra"))

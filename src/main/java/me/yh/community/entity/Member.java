@@ -1,9 +1,6 @@
 package me.yh.community.entity;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -20,10 +17,9 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 
 @EntityListeners(AuditingEntityListener.class)
-@Entity
 @DynamicInsert                      //null 값은 insert 할 때 제외
 @DynamicUpdate
-
+@Entity
 public class Member extends Address implements Persistable<String > {
 
     @Id
@@ -47,25 +43,49 @@ public class Member extends Address implements Persistable<String > {
     @ColumnDefault("'none'")
     private String profileImage;
 
-    @ColumnDefault("1")
-    private Boolean enable;
+    @ColumnDefault("'1'")
+    private Boolean enable = true;
 
     @ColumnDefault("'ROLE_USER'")
-    private String role;
+    private String role = "ROLE_USER";
 
     @Override
     public boolean isNew() {
         return createDate == null;
     }
 
-    public Member(String id, String password, String nickname, String email,
-                  String zoneCode, String address, String extraAddress, String detailAddress) {
-        super(zoneCode, address, extraAddress, detailAddress);
+    public Member(String id, String password, String nickname, String email) {
         this.id = id;
         this.password = password;
         this.nickname = nickname;
         this.email = email;
     }
+
+    public static Member testUser(String id) {
+        Member member = new Member();
+        member.id = id;
+        member.password = "pass";
+        member.nickname = "테스트";
+        member.email = "test@gmail";
+        member.profileImage = "none";
+        return member;
+    }
+
+    public static Member testUser(String id, String role) {
+        Member member = new Member();
+        member.id = id;
+        member.password = "pass";
+        member.nickname = "테스트";
+        member.email = "test@gmail";
+        member.profileImage = "none";
+        member.role = role;
+        return member;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
 
     public void encodePassword(PasswordEncoder passwordEncoder) {
         this.password = passwordEncoder.encode(this.password);

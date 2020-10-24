@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <title>글 쓰기</title>
+
+    <style>
+        .table td, .table th {
+            border-top: 0;
+        }
+
+        .table tr {
+            border-top: 1px solid #dee2e6
+        }
+
+        .table th {
+            padding: 0.7rem 0.75rem 0.1rem;
+        }
+
+        .table td {
+            padding: 0.1rem 0.75rem 0.7rem;
+        }
+
+        @media (min-width: 768px) {
+            .table th, .table td {
+                padding: .75em;
+            }
+        }
+    </style>
+</head>
+
+<main layout:fragment="content">
+    <section class="container">
+        <div>
+            <h1 class="font-Jua" th:text="${title}"></h1>
+        </div>
+
+        <form th:action="@{|/posts/${action}}" method="post" enctype="multipart/form-data"
+              onsubmit="return validateBoard(this);">
+
+            <input type="hidden" id="isDelete" name="isDelete" value="false" th:if="${action == 'edit'}">
+            <input type="hidden" name="parent" th:value="${parent}" th:if="${parent}">
+
+            <table class="table">
+                <tr class="row">
+                    <th class="col-md-2">제목</th>
+                    <td class="col-md-10">
+                        <input type="text" name="title" required minlength="1" maxlength="26" size="26" class="form-control" autocomplete="off" th:value="${post?.title}">
+                    </td>
+                </tr>
+                <tr class="row">
+                    <th class="col-md-2">내용</th>
+                    <td class="col-md-10">
+                        <textarea rows="14" name="content" class="form-control" required minlength="4" onkeyup="checkMaxByte(this);" th:text="${post?.content}">내용</textarea>
+                        <div class="float-right">
+                            <span class="currentByte">0</span><span class="maxByte">/4000 byte</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="row">
+                    <th class="col-md-2">첨부파일
+                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteFile();" th:if="${post?.file}">삭제버튼</button>
+                    </th>
+                    <td class="col-md-10">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="customFile" name="input-file" onchange="changeFile(this)">
+                            <label class="custom-file-label" for="customFile" th:text="${post?.file?.originalFileName == null ? '파일을 선택해 주세요.' : post.file.originalFileName}">파일 이름</label>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2" class="py-3 d-flex justify-content-around">
+                        <input type="submit" value="쓰기" class="btn btn-purple">
+                        <input type="button" value="취소" class="btn btn-purple" onclick="cancel();">
+                    </td>
+                </tr>
+            </table>
+
+        </form>
+
+    </section>
+</main>
+<th:block layout:fragment="src">
+<script th:src="@{/js/commons.js}"></script>
+<script th:src="@{/js/board.js}"></script>
+<!-- 다음 주소 API -->
+</th:block>
+</html>

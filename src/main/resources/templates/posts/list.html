@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <title>글 게시판</title>
+</head>
+
+<main layout:fragment="content" id="board-list">
+    <section class="container">
+        <div>
+            <h1>자유 게시판</h1>
+        </div>
+
+        <!--검색창-->
+        <article class="text-right my-3 float-right">
+            <form action="" onsubmit="return notAllowEmpty(this);">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <select class="form-control" name="f">
+                            <option value="title" th:selected="${page.field == 'title'}">제목</option>
+                            <option value="writer" th:selected="${page.field == 'writer'}">작성자</option>
+                        </select>
+                    </div>
+                    <input type="text" class="form-control" name="q" id="q" th:value="${page.query}">
+                    <div class="input-group-append">
+                        <button type="submit" class="form-control btn-purple"><i class="fa fa-search"></i></button>
+                    </div>
+                </div>
+            </form>
+        </article>
+
+        <!--게시글목록-->
+        <article class="table-responsive">
+            <table class="table tbl-board">
+                <thead>
+                <tr class="text-center">
+                    <th class="">번호</th>
+                    <th class="">제목</th>
+                    <th class="">작성자</th>
+                    <th class="">작성일</th>
+                    <th class="">추천</th>
+                    <th class="">조회</th>
+                </tr>
+                </thead>
+                <tbody>
+                <c:if test="${list != null}">
+                    <c:forEach items="${list}" var="b" varStatus="st">
+                        <tr class="text-center">
+                            <td>${b.articleNo}</td>
+                            <td class="text-left tbl-title">
+                                <a th:href="@{|/posts/p}" style="margin-left: ${b.lv * 14}px;">
+                                    <c:if test="${b.lv != 0}"><span class="icon-reply"></span></c:if>${b.title}</a>
+                                <c:if test="${b.cmt !=0}">
+                                    <span class="reply-count">${b.cmt}</span>
+                                </c:if>
+                            </td>
+                            <td class="">${b.writer}</td>
+                            <td>
+                                <fmt:parseDate value="${b.regDate}" pattern="yyyy-MM-dd'T'HH:mm" var="dateTime"
+                                               type="both"/>
+                                <c:if test="${isNow[st.index]}">
+                                    <fmt:formatDate pattern="HH:mm" value="${dateTime}"/>
+                                </c:if>
+                                <c:if test="${not isNow[st.index]}">
+                                    <fmt:formatDate pattern="yy.MM.dd" value="${dateTime}"/>
+                                </c:if>
+                            </td>
+                            <td>${b.recommend}</td>
+                            <td>${b.hit}</td>
+                        </tr>
+                    </c:forEach>
+                </c:if>
+                <c:if test="${listTotalCount == 0}">
+                    <tr class="text-center">
+                        <td colspan="6">검색된 결과가 없습니다.</td>
+                    </tr>
+                </c:if>
+                </tbody>
+            </table>
+        </article>
+        <div class="clearfix">
+            <div class="float-left">
+                <a th:href="@{/posts/new}">
+                    <button class="btn btn-outline-danger">글쓰기</button>
+                </a>
+            </div>
+            <h5 class="float-right"><span class="current-page-num">${p}</span>/<span
+                    class="font-weight-normal">${pageMaxNum}</span></h5>
+        </div>
+    </section>
+
+    <section class="container my-2 text-center clearfix">
+        <c:set var="startNum" value="${p-2}"/>
+        <nav class="pager">
+            <ul class="pagination">
+                <c:if test="${p != 1}">
+                    <li class="page-item"><a class="page-link" href="?f=${f}&q=${param.q}&p=1"><i
+                            class="fas fa-angle-double-left"></i></a></li>
+                    <li class="page-item"><a class="page-link" href="?f=${f}&q=${param.q}&p=${p-1}"><i
+                            class="fas fa-angle-left"></i></a></li>
+                </c:if>
+                <c:forEach var="i" begin="0" end="4">
+                    <c:set var="currentPageNum" value="${startNum + i}"/>
+                    <c:if test="${currentPageNum > 0 and currentPageNum <= pageMaxNum}">
+                        <li class="page-item ${currentPageNum == p ? "active" : ""}">
+                        <a class="page-link" href="<c:if test="${currentPageNum == p}">javascript:;</c:if>
+                    <c:if test="${currentPageNum != p}">?f=${f}&q=${param.q}&p=${currentPageNum}</c:if> ">${currentPageNum}
+                    </a>
+                    </li>
+                    </c:if>
+                </c:forEach>
+                <c:if test="${p < pageMaxNum}">
+                    <li class="page-item"><a class="page-link" href="?f=${f}&q=${param.q}&p=${p+1}"><i
+                            class="fas fa-angle-right"></i></a></li>
+                    <li class="page-item"><a class="page-link" href="?f=${f}&q=${param.q}&p=${pageMaxNum}"><i
+                            class="fas fa-angle-double-right"></i></a></li>
+                </c:if>
+            </ul>
+        </nav>
+    </section>
+</main>
+<th:block layout:fragment="src">
+<script th:src="@{/js/commons.js}"></script>
+<script th:src="@{/js/board.js}"></script>
+<!-- 다음 주소 API -->
+</th:block>
+</html>

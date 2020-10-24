@@ -42,6 +42,8 @@ public class HomeController {
                 Utils.redirectErrorPage(model, "잘못된 값이 입력 되었습니다.", "/index");break;
             case "FAIL_MODIFY_MEMBER":
                 Utils.redirectErrorPage(model, "회원 수정을 실패하였습니다.","/members/me");break;
+            case "FAIL_ADD_POST":
+                Utils.redirectErrorPage(model, "글 작성을 실패하였습니다.", "/posts");
         }
         return "error/error-redirect";
     }

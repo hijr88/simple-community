@@ -34,7 +34,7 @@ public class SecurityTest {
     @Transactional
     @Test
     void login_success() throws Exception{
-        Member member = new Member("test","1234","nick","123@email","","","","");
+        Member member = Member.testUser("test");
         memberService.createNewMember(member);
 
         em.flush();
@@ -47,7 +47,7 @@ public class SecurityTest {
     @Test
     @Transactional
     void login_fail() throws Exception{
-        Member member = new Member("test","1234","nick","123@email","","","","");
+        Member member = Member.testUser("test");
         memberService.createNewMember(member);
 
         em.flush();

@@ -1,12 +1,10 @@
 package me.yh.community.repository;
 
-import me.yh.community.config.JpaAuditingConfiguration;
 import me.yh.community.entity.Member;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
 
 import javax.persistence.EntityManager;
 import java.util.Optional;
@@ -15,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
-@Import(JpaAuditingConfiguration.class)
 class MemberRepositoryTest {
 
     @Autowired
@@ -26,10 +23,13 @@ class MemberRepositoryTest {
 
     @BeforeEach
     void init() {
-        Member newMember1 = new Member("woo", "0806", "은별", "abc@aaa", null, null, null, null);
+        Member newMember1 = Member.testUser("woo");
+        newMember1.setEmail("abc@aaa");
+
         memberRepository.save(newMember1);
 
-        Member newMember2 = new Member("nara", "1315", "우리", "abc@nav", null, null, null, null);
+        Member newMember2 = Member.testUser("nana");
+        newMember2.setEmail("abc");
         memberRepository.save(newMember2);
 
         em.flush();

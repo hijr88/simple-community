@@ -32,8 +32,8 @@ public class HomeController {
     public String error(Model model) {
         String type = (String) model.getAttribute("type");
         if (type == null) {
-            Utils.redirectErrorPage(model, "시작 페이지로 이동합니다.", "/index");
-            return "error/error-redirect";
+            //Utils.redirectErrorPage(model, "시작 페이지로 이동합니다.", "/index");
+            return "redirect:/";
         }
         switch (type) {
             case "FAIL_ADD_MEMBER":
@@ -43,7 +43,9 @@ public class HomeController {
             case "FAIL_MODIFY_MEMBER":
                 Utils.redirectErrorPage(model, "회원 수정을 실패하였습니다.","/members/me");break;
             case "FAIL_ADD_POST":
-                Utils.redirectErrorPage(model, "글 작성을 실패하였습니다.", "/posts");
+                Utils.redirectErrorPage(model, "글 작성을 실패하였습니다.", "/posts");break;
+            case "BAD_REQUEST":
+                Utils.redirectErrorPage(model, "잘못된 요청입니다.","/index");break;
         }
         return "error/error-redirect";
     }

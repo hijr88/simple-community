@@ -1,20 +1,22 @@
 package me.yh.community.entity;
 
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(exclude = "member")
+@ToString(exclude = {"member","files"})
 
 @EntityListeners(AuditingEntityListener.class)
 @DynamicInsert
@@ -26,7 +28,7 @@ import java.time.LocalDateTime;
         allocationSize=1
 )
 @Entity
-public class Post {
+public class Post{
 
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE,
             generator = "post_seq_gen")
@@ -39,7 +41,7 @@ public class Post {
     @Column(length = 4000, nullable = false)
     private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "writer")
     private Member member;
 
@@ -68,20 +70,29 @@ public class Post {
     @ColumnDefault("'1'")
     private Boolean pub;
 
-    @OneToOne(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "post")
-    private PostFile file;
+    @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "post")
+    private List<PostFile> files = new ArrayList<>();
 
-    public static Post createNewPost(String title, String content, Member member) {
-        Post post = new Post();
+    @Builder
+    public Post(String title, String content, Member member, Long parent) {
+        this.title = title;
+        this.content = content;
+        this.member = member;
+        this.parent = parent;
+    }
 
-        post.title = title;
-        post.content = content;
-        post.member = member;
-
-        return post;
+    public Post(String title, String content, Member member, Long parent, long groupNo, Integer groupOrder, Integer dept) {
+        this.title = title;
+        this.content = content;
+        this.member = member;
+        this.parent = parent;
+        this.groupNo = groupNo;
+        this.groupOrder = groupOrder;
+        this.dept = dept;
     }
 
     public void changeFile(PostFile file) {
-        this.file = file;
+        this.getFiles().add(file);
+        file.setPost(this);
     }
 }

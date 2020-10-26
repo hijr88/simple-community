@@ -44,38 +44,29 @@
                 </tr>
                 </thead>
                 <tbody>
-                <c:if test="${list != null}">
-                    <c:forEach items="${list}" var="b" varStatus="st">
-                        <tr class="text-center">
-                            <td>${b.articleNo}</td>
-                            <td class="text-left tbl-title">
-                                <a th:href="@{|/posts/p}" style="margin-left: ${b.lv * 14}px;">
-                                    <c:if test="${b.lv != 0}"><span class="icon-reply"></span></c:if>${b.title}</a>
-                                <c:if test="${b.cmt !=0}">
-                                    <span class="reply-count">${b.cmt}</span>
-                                </c:if>
-                            </td>
-                            <td class="">${b.writer}</td>
-                            <td>
-                                <fmt:parseDate value="${b.regDate}" pattern="yyyy-MM-dd'T'HH:mm" var="dateTime"
-                                               type="both"/>
-                                <c:if test="${isNow[st.index]}">
-                                    <fmt:formatDate pattern="HH:mm" value="${dateTime}"/>
-                                </c:if>
-                                <c:if test="${not isNow[st.index]}">
-                                    <fmt:formatDate pattern="yy.MM.dd" value="${dateTime}"/>
-                                </c:if>
-                            </td>
-                            <td>${b.recommend}</td>
-                            <td>${b.hit}</td>
-                        </tr>
-                    </c:forEach>
-                </c:if>
-                <c:if test="${listTotalCount == 0}">
-                    <tr class="text-center">
+                    <tr class="text-center" th:each="p, st: ${list}">
+                        <td>
+                            <span th:text="${p.id}">글 번호</span>
+                        </td>
+                        <td class="text-left tbl-title">
+                            <a th:href="@{|/posts/${p.id}}" th:style="|margin-left: ${p.dept * 14}px;|">
+                                <span class="icon-reply" th:if="${p.dept != 0}"></span><span th:text="${p.title}"></span>
+                            </a>
+                            <span class="reply-count">2</span>
+                        </td>
+                        <td>
+                            <span th:text="${p.writer}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${isNow[st.index]} ? ${#temporals.format(p.createDate, 'HH:mm')} : ${#temporals.format(p.createDate, 'yy.MM.dd')}"></span>
+                        </td>
+                        <td><span th:text="${p.recommend}">추천수</span></td>
+                        <td><span th:text="${p.hit}">조회수</span></td>
+                    </tr>
+
+                    <tr class="text-center" th:if="${list.size() == 0}">
                         <td colspan="6">검색된 결과가 없습니다.</td>
                     </tr>
-                </c:if>
                 </tbody>
             </table>
         </article>

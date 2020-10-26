@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/layout}">
 <head>
-    <title>글 쓰기</title>
+    <title th:text="${title}">글 쓰기</title>
 
     <style>
         .table td, .table th {
@@ -38,9 +38,9 @@
 
         <form th:action="@{|/posts/${action}}" method="post" enctype="multipart/form-data"
               onsubmit="return validateBoard(this);">
-
             <input type="hidden" id="isDelete" name="isDelete" value="false" th:if="${action == 'edit'}">
-            <input type="hidden" name="parent" th:value="${parent}" th:if="${parent}">
+
+            <input type="hidden" name="parent" th:if="${parent}" th:value="${parent}">
 
             <table class="table">
                 <tr class="row">
@@ -85,6 +85,5 @@
 <th:block layout:fragment="src">
 <script th:src="@{/js/commons.js}"></script>
 <script th:src="@{/js/board.js}"></script>
-<!-- 다음 주소 API -->
 </th:block>
 </html>

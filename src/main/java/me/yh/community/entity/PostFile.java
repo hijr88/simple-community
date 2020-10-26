@@ -1,10 +1,13 @@
 package me.yh.community.entity;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
+@Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 
 @SequenceGenerator(name="seq_gen", sequenceName="post_file_seq",
@@ -16,7 +19,7 @@ public class PostFile {
     @Column(name = "post_file_id")
     private Long id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;
 

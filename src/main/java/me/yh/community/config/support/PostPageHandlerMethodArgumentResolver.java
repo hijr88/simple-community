@@ -1,6 +1,6 @@
 package me.yh.community.config.support;
 
-import me.yh.community.dto.PostPage;
+import me.yh.community.dto.post.PostPage;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;

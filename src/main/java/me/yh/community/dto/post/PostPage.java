@@ -1,4 +1,4 @@
-package me.yh.community.dto;
+package me.yh.community.dto.post;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

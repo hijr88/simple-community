@@ -342,7 +342,7 @@ table.tbl-board tbody tr:hover a {
     width: 7px;
     height: 7px;
     display: inline-block;
-    background: url("/web/resources/images/reply.png");
+    background: url("/images/reply.png");
     margin-right: 3px;
 }
 

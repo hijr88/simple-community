@@ -25,4 +25,7 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
     @Modifying
     @Query("update Post p set p.hit = p.hit +1 where p.id = :id")
     void incrementHitById(@Param("id") long id);
+
+    @Query("select count(p) from Post p where p.parent =:parent and p.delete = false")
+    int countByParent(@Param("parent") long parent);
 }

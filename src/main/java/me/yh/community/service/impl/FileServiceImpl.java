@@ -118,4 +118,24 @@ public class FileServiceImpl implements FileService {
         }
         return true;
     }
+
+    /**
+     * @param folderPath 삭제할 폴더 경로
+     * @return 성공 했으면 true
+     */
+    @Override
+    public boolean deleteFolder(String folderPath) {
+
+        File file = new File(folderPath);
+        if (file.exists()) {
+            File[] fList = file.listFiles();  //폴더 안에 있는 파일목록
+            if (fList != null) {                //비어 있지 않다면 파일 전부 제거
+                for (File f : fList) {
+                    f.delete();
+                }
+            }
+            return file.delete();           //그러고 나서 폴더 삭제 시도
+        } else
+            return true;
+    }
 }

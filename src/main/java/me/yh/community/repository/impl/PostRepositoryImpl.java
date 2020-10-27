@@ -2,10 +2,7 @@ package me.yh.community.repository.impl;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import me.yh.community.Utils;
-import me.yh.community.dto.post.PostDetailDto;
-import me.yh.community.dto.post.PostListDto;
-import me.yh.community.dto.post.QPostDetailDto;
-import me.yh.community.dto.post.QPostListDto;
+import me.yh.community.dto.post.*;
 import me.yh.community.entity.QPostFile;
 import me.yh.community.entity.QPostRecommend;
 import me.yh.community.repository.custom.PostRepositoryCustom;
@@ -36,6 +33,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .from(post)
                 .join(post.member, member)
                 .leftJoin(recommend).on(post.id.eq(recommend.postId))
+                .where(post.delete.eq(false))
                 .groupBy(post.id, post.title, post.member.nickname, post.createDate, post.hit, post.dept)
                 .orderBy(post.groupNo.desc(), post.groupOrder.asc())
                 .fetch();
@@ -53,7 +51,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .join(post.member, member)
                 .leftJoin(post.files, file)
                 .leftJoin(recommend).on(post.id.eq(recommend.postId))
-                .where(post.id.eq(id).and(post.pub.eq(pub)))
+                .where(post.id.eq(id).and(post.pub.eq(pub)).and(post.delete.eq(false)))
                 .groupBy(post.id, post.title, post.content, member.id, member.nickname, member.profileImage, post.createDate, post.hit, file.fileName, file.originalFileName)
                 .fetchOne();
 
@@ -65,5 +63,18 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
             postDetail.setProfileImage(Utils.urlEncode(postDetail.getProfileImage()));
         }
         return postDetail;
+    }
+
+    @Override
+    public PostEditDto findPostEditById(Long id) {
+
+        QPostFile file = postFile;
+
+        return queryFactory
+                .select(new QPostEditDto(post.title, post.content, post.member.id, file.originalFileName))
+                .from(post)
+                .leftJoin(post.files, file)
+                .where(post.id.eq(id).and(post.pub.eq(true)).and(post.delete.eq(false)))
+                .fetchOne();
     }
 }

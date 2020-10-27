@@ -31,4 +31,19 @@ public class PostApiController {
             return ResponseEntity.ok(0);
         }
     }
+
+    /**
+     *  답글 달린 글은 삭제 불가 (0), 삭제 했으면 1
+     */
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<Integer> deletePost(@PathVariable("postId") long id) {
+        boolean result = postService.deletePost(id);
+
+        if (result) {
+            return ResponseEntity.ok(1);
+        } else {
+            return ResponseEntity.ok(0);
+        }
+    }
+
 }

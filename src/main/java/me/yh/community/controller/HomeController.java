@@ -46,6 +46,8 @@ public class HomeController {
                 Utils.redirectErrorPage(model, "글 작성을 실패하였습니다.", "/posts");break;
             case "BAD_REQUEST":
                 Utils.redirectErrorPage(model, "잘못된 요청입니다.","/index");break;
+            case "FAIL_MODIFY_POST":
+                Utils.redirectErrorPage(model, "글 수정을 실패하였습니다.","/posts");break;
         }
         return "error/error-redirect";
     }

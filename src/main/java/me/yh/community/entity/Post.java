@@ -70,6 +70,9 @@ public class Post{
     @ColumnDefault("'1'")
     private Boolean pub;
 
+    @ColumnDefault("'0'")
+    private Boolean delete;
+
     @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "post")
     private List<PostFile> files = new ArrayList<>();
 
@@ -94,5 +97,10 @@ public class Post{
     public void changeFile(PostFile file) {
         this.getFiles().add(file);
         file.setPost(this);
+    }
+
+    public void modify(String title, String content) {
+        this.title = title;
+        this.content = content;
     }
 }

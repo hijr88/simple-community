@@ -29,6 +29,7 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final FileService fileService;
     private final PostRecommendRepository postRecommendRepository;
+    private final String SE = FileService.SE;
 
     //TODO 게시판 리스트
 
@@ -93,9 +94,58 @@ public class PostServiceImpl implements PostService {
         return true;
     }
 
+    @Transactional
+    @Override
+    public boolean modify(long id, PostRequestDto editPost, MultipartFile mf, boolean isDelete) {
+
+        Optional<Post> findPost = postRepository.findById(id);
+        if (findPost.isEmpty())
+            return false;
+        Post post = findPost.get();
+        post.modify(editPost.getTitle(), editPost.getContent()); //글 수정
+
+        //파일 수정
+        String folderPath = FileService.postPath + SE + id;
+
+        if (isDelete) { //파일 삭제인 경우
+            PostFile postFile = post.getFiles().get(0); //파일 정보 가져오기
+
+            //삭제 처리
+            String filePath = folderPath + SE + postFile.getFileName();
+            fileService.deleteFile(filePath);
+            post.getFiles().remove(postFile);
+        }
+        if (!mf.isEmpty()) {//파일이 첨부된 경우
+
+            // 기존 파일이 존재하면 삭제
+            if (post.getFiles().size() != 0) {
+                PostFile postFile = post.getFiles().get(0);
+                String filePath = folderPath + SE + postFile.getFileName();
+                fileService.deleteFile(filePath);
+                post.getFiles().remove(postFile);
+            }
+            return createPostFile(post, mf);
+        }
+        return true;
+    }
+
+    @Transactional
+    @Override
+    public boolean deletePost(long id) {
+        int count = postRepository.countByParent(id);
+        if (count !=0) { //답글이 있는경우
+            return false;
+        } else {
+            fileService.deleteFolder(FileService.postPath + SE + id);
+            Optional<Post> byId = postRepository.findById(id);
+            byId.ifPresent(post -> post.setDelete(true));
+            return true;
+        }
+    }
+
     private boolean createPostFile(Post savePost, MultipartFile mf) {
         if (!mf.isEmpty()) {
-            String folderPath = FileService.postPath + File.separator + savePost.getId();
+            String folderPath = FileService.postPath + SE + savePost.getId();
             String saveFileName = fileService.upload(folderPath, mf);
             if(saveFileName == null) return false;
 

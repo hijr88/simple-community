@@ -359,21 +359,20 @@ async function upRecommend() {
     }
 }
 
-async function deleteBoard(articleNo) { //글번호
+async function deletePost(postId) { //글번호
     if (!confirm('정말 삭제하시겠습니까?\n삭제하면 복구가 불가능합니다.')) return;
-    const response = await fetch(`${getRoot()}/boards/${articleNo}`, {
+    const response = await fetch(`${getRoot()}/api/posts/${postId}`, {
         method: 'DELETE'
     });
-    if (response.status === 200) {
-        const text = await response.text();
-        if (text === '44')
-            alert('답변이 달린 게시글은 삭제할 수 없습니다.');
-        else if (text === '1')
-            location.href = `${getRoot()}/boards`;
-        else
-            alert('다시 시도 해주세요.');
+    if (!response.ok) {
+        alert('Server Error!!')
+        return;
+    }
+    const responseText = await response.text();
+    if (responseText === '1') {
+        location.href = `${getRoot()}/posts`;
     } else {
-        alert('delete, Error');
+        alert('답변이 달린 게시글은 삭제할 수 없습니다.');
     }
 }
 

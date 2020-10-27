@@ -12,4 +12,8 @@ public interface PostService {
     PostDetailDto findPostDetailByIdAndPub(long id, boolean pub);
 
     boolean incrementRecommend(long postId, String userName);
+
+    boolean modify(long id, PostRequestDto editPost, MultipartFile mf, boolean isDelete);
+
+    boolean deletePost(long id);
 }

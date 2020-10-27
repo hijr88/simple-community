@@ -16,9 +16,11 @@ public interface FileService {
 
     void toThumbnail(HttpServletResponse response, File file, int width, int height) throws IOException;
 
-    boolean deleteFile(String filePath);
-
     String upload(String folderPath, MultipartFile mf);
 
     void download(HttpServletResponse response, File file, String originalFileName) throws IOException;
+
+    boolean deleteFile(String filePath);
+
+    boolean deleteFolder(String folderPath);
 }

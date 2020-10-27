@@ -35,13 +35,10 @@
         <div>
             <h1 class="font-Jua" th:text="${title}"></h1>
         </div>
-
         <form th:action="@{|/posts/${action}}" method="post" enctype="multipart/form-data"
-              onsubmit="return validateBoard(this);">
-            <input type="hidden" id="isDelete" name="isDelete" value="false" th:if="${action == 'edit'}">
-
+              onsubmit="return validatePost(this);">
+            <input type="hidden" id="isDelete" name="isDelete" value="false" th:if="${action != 'new'}">
             <input type="hidden" name="parent" th:if="${parent}" th:value="${parent}">
-
             <table class="table">
                 <tr class="row">
                     <th class="col-md-2">제목</th>
@@ -60,16 +57,15 @@
                 </tr>
                 <tr class="row">
                     <th class="col-md-2">첨부파일
-                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteFile();" th:if="${post?.file}">삭제버튼</button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteFile();" th:if="${post?.originalFileName}">삭제버튼</button>
                     </th>
                     <td class="col-md-10">
                         <div class="custom-file">
                             <input type="file" class="custom-file-input" id="customFile" name="input-file" onchange="changeFile(this)">
-                            <label class="custom-file-label" for="customFile" th:text="${post?.file?.originalFileName == null ? '파일을 선택해 주세요.' : post.file.originalFileName}">파일 이름</label>
+                            <label class="custom-file-label" for="customFile" th:text="${post?.originalFileName == null ? '파일을 선택해 주세요.' : post.originalFileName}">파일 이름</label>
                         </div>
                     </td>
                 </tr>
-
                 <tr>
                     <td colspan="2" class="py-3 d-flex justify-content-around">
                         <input type="submit" value="쓰기" class="btn btn-purple">
@@ -77,13 +73,11 @@
                     </td>
                 </tr>
             </table>
-
         </form>
-
     </section>
 </main>
 <th:block layout:fragment="src">
 <script th:src="@{/js/commons.js}"></script>
-<script th:src="@{/js/board.js}"></script>
+<script th:src="@{/js/post/post.js}"></script>
 </th:block>
 </html>

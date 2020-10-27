@@ -1,7 +1,7 @@
 'use strict'
 
 //게시판 작성페이지
-function validateBoard(form) {
+function validatePost(form) {
     const title = form.title;
     const content = form.content;
     if (title.value.length === 0) {
@@ -115,7 +115,7 @@ async function updateBoardsPub() {
 
 //관리자 게시판 체크박스 모두 선택
 function checkedBoardsPub() {
-    const allNo = document.querySelectorAll('input[name=no');
+    const allNo = document.querySelectorAll('input[name=no]');
 
     allNo.forEach(i => {
         i.checked = true;
@@ -124,7 +124,7 @@ function checkedBoardsPub() {
 
 //관리자 게시판 체크박스 모두 해제
 function unCheckedBoardsPub() {
-    const allNo = document.querySelectorAll('input[name=no');
+    const allNo = document.querySelectorAll('input[name=no]');
 
     allNo.forEach(i => {
         i.checked = false;

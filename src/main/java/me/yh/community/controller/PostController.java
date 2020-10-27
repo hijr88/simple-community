@@ -2,10 +2,7 @@ package me.yh.community.controller;
 
 import lombok.RequiredArgsConstructor;
 import me.yh.community.Utils;
-import me.yh.community.dto.post.PostDetailDto;
-import me.yh.community.dto.post.PostListDto;
-import me.yh.community.dto.post.PostPage;
-import me.yh.community.dto.post.PostRequestDto;
+import me.yh.community.dto.post.*;
 import me.yh.community.entity.Member;
 import me.yh.community.repository.MemberRepository;
 import me.yh.community.repository.PostRepository;
@@ -61,7 +58,6 @@ public class PostController {
      */
     @GetMapping("/new")
     public String newForm(Model model) {
-
         model.addAttribute("title", "새 글 쓰기");
         model.addAttribute("action","new");
 
@@ -82,7 +78,6 @@ public class PostController {
         }
 
         Optional<Member> findMember = memberRepository.findById(principal.getName());
-
         if (findMember.isEmpty()) {
             ra.addFlashAttribute("type","FAIL_ADD_POST");
             return "redirect:/error-redirect";
@@ -90,7 +85,6 @@ public class PostController {
         Member member = findMember.get();
 
         boolean result;
-
         if (newPost.getParent() == null) {
             result = postService.createNewPost(newPost, member, mf);
         } else {
@@ -143,6 +137,44 @@ public class PostController {
         model.addAttribute("p", post);
         model.addAttribute("qs", Utils.getPreQS(request));
         return "posts/detail";
+    }
+
+    @GetMapping("/{id}/edit")
+    public String editForm(Model model, RedirectAttributes ra,
+                           @PathVariable long id, Principal principal) {
+
+        String username = principal.getName();
+
+        model.addAttribute("title", "수정하기");
+        model.addAttribute("action",id + "/edit");
+
+        PostEditDto post = postRepository.findPostEditById(id);
+        if (post == null || !post.getMemberId().equals(username)) { // 비공개 글이거나 작성자와 아이디가 다른경우
+            ra.addFlashAttribute("type","BAD_REQUEST");
+            return "redirect:/error-redirect";
+        }
+
+        model.addAttribute("post",post);
+        return "posts/form";
+    }
+
+    @PostMapping("{id}/edit")
+    public String modifyPost(RedirectAttributes ra,
+                             @RequestParam(name = "input-file", required = false) MultipartFile mf,
+                             @RequestParam("isDelete") boolean isDelete,
+                             @ModelAttribute PostRequestDto editPost, BindingResult bindingResult,
+                             @PathVariable long id) {
+        if (bindingResult.hasErrors()) {
+            ra.addFlashAttribute("type","FAIL_BINDING");
+            return "redirect:/error-redirect";
+        }
+        boolean result = postService.modify(id, editPost, mf, isDelete);
+        if (result) {
+            return "redirect:/posts/" + id;
+        }
+
+        ra.addFlashAttribute("type","FAIL_MODIFY_POST");
+        return "redirect:/error-redirect";
     }
 
 

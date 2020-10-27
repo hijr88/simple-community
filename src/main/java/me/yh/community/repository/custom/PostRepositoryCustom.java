@@ -9,5 +9,5 @@ public interface PostRepositoryCustom {
 
     List<PostListDto> findPostList();
 
-    PostDetailDto findPostDetailById(Long id);
+    PostDetailDto findPostDetailByIdAndPub(Long id, boolean pub);
 }

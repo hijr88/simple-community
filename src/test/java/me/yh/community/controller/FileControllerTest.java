@@ -49,4 +49,13 @@ class FileControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("NOT_FOUND"));
     }
+
+    @Test
+    void downloadFile() throws Exception {
+
+        mockMvc.perform(get("/files/down/posts/1/file.jpg")
+                            .param("o","original"))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
 }

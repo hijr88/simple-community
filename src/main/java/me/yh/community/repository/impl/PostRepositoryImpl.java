@@ -35,14 +35,14 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .select(new QPostListDto(post.id, post.title, post.member.nickname, post.createDate, recommend.count(), post.hit, post.dept))
                 .from(post)
                 .join(post.member, member)
-                .leftJoin(recommend).on(post.id.eq(recommend.post.id))
+                .leftJoin(recommend).on(post.id.eq(recommend.postId))
                 .groupBy(post.id, post.title, post.member.nickname, post.createDate, post.hit, post.dept)
                 .orderBy(post.groupNo.desc(), post.groupOrder.asc())
                 .fetch();
     }
 
     @Override
-    public PostDetailDto findPostDetailById(Long id) {
+    public PostDetailDto findPostDetailByIdAndPub(Long id, boolean pub) {
 
         QPostRecommend recommend = postRecommend;
         QPostFile file = postFile;
@@ -52,18 +52,18 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .from(post)
                 .join(post.member, member)
                 .leftJoin(post.files, file)
-                .leftJoin(recommend).on(post.id.eq(recommend.post.id))
-                .where(post.id.eq(id))
+                .leftJoin(recommend).on(post.id.eq(recommend.postId))
+                .where(post.id.eq(id).and(post.pub.eq(pub)))
                 .groupBy(post.id, post.title, post.content, member.id, member.nickname, member.profileImage, post.createDate, post.hit, file.fileName, file.originalFileName)
                 .fetchOne();
 
         if (postDetail != null) {
             if (postDetail.getFileName() != null) {
                 postDetail.setFileName(Utils.urlEncode(postDetail.getFileName()));
+                //postDetail.setOriginalFileName(Utils.urlEncode(postDetail.getOriginalFileName()));
             }
             postDetail.setProfileImage(Utils.urlEncode(postDetail.getProfileImage()));
         }
-
         return postDetail;
     }
 }

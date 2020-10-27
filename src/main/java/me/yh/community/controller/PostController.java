@@ -1,6 +1,7 @@
 package me.yh.community.controller;
 
 import lombok.RequiredArgsConstructor;
+import me.yh.community.Utils;
 import me.yh.community.dto.post.PostDetailDto;
 import me.yh.community.dto.post.PostListDto;
 import me.yh.community.dto.post.PostPage;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -127,17 +129,19 @@ public class PostController {
      *  글 상세 보기
      */
     @GetMapping("/{id}")
-    public String postDetail(RedirectAttributes ra, Model model, @PathVariable long id) {
+    public String postDetail(HttpServletRequest request,
+                             RedirectAttributes ra, Model model, @PathVariable long id) {
 
-        boolean result = postRepository.existsById(id);
+        boolean result = postRepository.existsByIdAndPub(id, true);
 
         if (!result) { //부모글이 존재 하지 않으면 에러 처리
             ra.addFlashAttribute("type","BAD_REQUEST");
             return "redirect:/error-redirect";
         }
-        PostDetailDto post = postRepository.findPostDetailById(id);
+        PostDetailDto post = postService.findPostDetailByIdAndPub(id, true);
 
         model.addAttribute("p", post);
+        model.addAttribute("qs", Utils.getPreQS(request));
         return "posts/detail";
     }
 

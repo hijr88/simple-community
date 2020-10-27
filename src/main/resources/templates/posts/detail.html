@@ -10,7 +10,7 @@
 <main layout:fragment="content" id="boardDetail">
     <input type="hidden" id="user-name" th:value="${#authentication.name}">
     <input type="hidden" id="admin" th:value="${#authorization.expression('hasRole(''ADMIN'')')} ? 'true' : 'false' ">
-    <input type="hidden" id="ano" th:value="${p.postId}">
+    <input type="hidden" id="post-id" th:value="${p.postId}">
 
     <section class="container">
         <table class="table ">
@@ -20,7 +20,6 @@
                         <img th:src="@{|/files/thumb/profile/${p.memberId}/${p.profileImage}(w=30,h=30)}" width="30" height="30"
                         class="border rounded-circle" alt="프로필 이미지">
                     </div>
-                    <input type="hidden" value="${b.articleNo}" id="articleNo">
                     <div class="d-inline-block align-middle" style="word-break: break-all">
                         <span class="board-info" th:text="|작성자 ${p.nickname}(${p.memberId})|">작성자 </span>
                         <span class="board-info ml-2" th:text="|추천 ${p.recommend}|">추천수 </span>
@@ -39,8 +38,7 @@
                 <th class="col-md-2">첨부파일</th>
                 <td class="col-md-10 clearfix">
                     <div class="form-control text-center">
-                        <a th:href="@{|/files/posts/${p.postId}/${p.fileName}(fname=${p.originalFileName})}"
-                           class="text-info">
+                        <a th:href="@{|/files/down/posts/${p.postId}/${p.fileName}(o=${p.originalFileName})}" class="text-info">
                             <h5 class="d-inline" style="word-break: break-all" th:text="${#strings.length(p.originalFileName)} > 36 ? ${#strings.substring(p.originalFileName,0,36)} : ${p.originalFileName}"></h5>
                         </a>
                     </div>
@@ -65,15 +63,14 @@
         </table>
     </section>
     <div class="container my-3 clearfix action">
-        <button class="btn btn-outline-dark" onclick="toggleViewComment();">댓글<span class="text-danger ml-1"
-                                                                                    id="total-comment-count">0</span>
+        <button class="btn btn-outline-dark" onclick="toggleViewComment();">
+            <span>댓글</span><span class="text-danger ml-1" id="total-comment-count">댓글수</span>
         </button>
-        <button class="btn btn-outline-dark" onclick="upRecommend();">추천하기<span class="text-danger ml-1"
-                                                                                id="recommend-count">${b.recommend}</span>
+        <button class="btn btn-outline-dark" onclick="upRecommend();">추천하기
+            <span class="text-danger ml-1" id="recommend-count" th:text="${p.recommend}">추천수</span>
         </button>
         <a th:href="@{|${p.postId}/reply|}" class="btn btn-outline-danger float-right">답글</a>
     </div>
-
 
     <section class="container my-3 p-2 bg-light-gray" id="comment-view">
 
@@ -125,7 +122,8 @@
             <!-- 이거 복사 -->
             <li class="list-group-item p-2">
                 <div class="comment-info">
-                    <img th:src="@{|/files/thumb/profile/${username}/${profileImage}(w=30,h=30)}"
+                    <img th:src="@{|/files/thumb/profile/${p.memberId}/${p.profileImage}(w=30,h=30)}"
+
                     alt="프로필이미지" class="rounded-circle" width="30" height="30">
                     <span class="comment-writer text-muted">작성자입니다12</span>
                     <span class="mx-2" style="color: #e2d7df;">|</span>

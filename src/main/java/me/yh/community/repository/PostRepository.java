@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface PostRepository extends JpaRepository<Post, Long>, PostRepositoryCustom {
 
-    boolean existsById(Long id);
+    boolean existsByIdAndPub(Long id, boolean pub);
 
     @Query("select max(p.groupOrder) from Post p where p.parent = :id")
     Integer findLastChildOrderById(@Param("id") Long id);
@@ -21,4 +21,8 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
     @Modifying
     @Query("update Post p set p.groupOrder = p.groupOrder +1 where p.groupNo = :groupNo and p.groupOrder >= :groupOrder")
     void incrementGroupOrder(@Param("groupNo") long groupNo, @Param("groupOrder") int groupOrder);
+
+    @Modifying
+    @Query("update Post p set p.hit = p.hit +1 where p.id = :id")
+    void incrementHitById(@Param("id") long id);
 }

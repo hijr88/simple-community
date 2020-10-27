@@ -121,7 +121,7 @@ class PostControllerTest {
         PostDetailDto postDetailDto = new PostDetailDto();
 
         given(postRepository.existsById(id)).willReturn(true);
-        given(postRepository.findPostDetailById(id)).willReturn(postDetailDto);
+        given(postRepository.findPostDetailByIdAndPub(id,true)).willReturn(postDetailDto);
 
         mockMvc.perform(get("/posts/100"))
                 .andExpect(status().isOk());

@@ -1,10 +1,13 @@
 package me.yh.community.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import me.yh.community.dto.post.PostDetailDto;
 import me.yh.community.dto.post.PostRequestDto;
 import me.yh.community.entity.Member;
 import me.yh.community.entity.Post;
 import me.yh.community.entity.PostFile;
+import me.yh.community.entity.PostRecommend;
+import me.yh.community.repository.PostRecommendRepository;
 import me.yh.community.repository.PostRepository;
 import me.yh.community.service.FileService;
 import me.yh.community.service.PostService;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityManager;
 import java.io.File;
 import java.util.Optional;
 
@@ -21,8 +25,10 @@ import java.util.Optional;
 @Service
 public class PostServiceImpl implements PostService {
 
+    private final EntityManager em;
     private final PostRepository postRepository;
     private final FileService fileService;
+    private final PostRecommendRepository postRecommendRepository;
 
     //TODO 게시판 리스트
 
@@ -30,7 +36,6 @@ public class PostServiceImpl implements PostService {
     @Transactional
     @Override
     public boolean createNewPost(PostRequestDto newPost, Member member, MultipartFile mf) {
-
         Post post = PostRequestDto.createNewPost(newPost, member);
 
         Post savePost = postRepository.save(post);
@@ -42,7 +47,6 @@ public class PostServiceImpl implements PostService {
     @Transactional
     @Override
     public boolean createReplyPost(PostRequestDto newPost, Member member, MultipartFile mf) {
-
         Optional<Post> parentPost_ = postRepository.findById(newPost.getParent());
         if (parentPost_.isEmpty())
             return false;
@@ -69,14 +73,33 @@ public class PostServiceImpl implements PostService {
         return createPostFile(savePost, mf);
     }
 
-    private boolean createPostFile(Post savePost, MultipartFile mf) {
+    @Transactional
+    @Override
+    public PostDetailDto findPostDetailByIdAndPub(long id, boolean pub) {
+        postRepository.incrementHitById(id);
 
+        return postRepository.findPostDetailByIdAndPub(id, true);
+    }
+
+    @Transactional
+    @Override
+    public boolean incrementRecommend(long postId, String userName) {
+        boolean exists = postRecommendRepository.existsByPostIdAndMemberId(postId, userName);
+        if (exists)
+            return false;
+
+        PostRecommend recommend = new PostRecommend(postId, userName);
+        em.persist(recommend);
+        return true;
+    }
+
+    private boolean createPostFile(Post savePost, MultipartFile mf) {
         if (!mf.isEmpty()) {
             String folderPath = FileService.postPath + File.separator + savePost.getId();
             String saveFileName = fileService.upload(folderPath, mf);
             if(saveFileName == null) return false;
 
-            PostFile postFile = new PostFile(savePost, mf.getOriginalFilename(), saveFileName, mf.getSize());
+            PostFile postFile = new PostFile(savePost, saveFileName, mf.getOriginalFilename(), mf.getSize());
 
             savePost.changeFile(postFile);
         }

@@ -19,4 +19,6 @@ public interface FileService {
     boolean deleteFile(String filePath);
 
     String upload(String folderPath, MultipartFile mf);
+
+    void download(HttpServletResponse response, File file, String originalFileName) throws IOException;
 }

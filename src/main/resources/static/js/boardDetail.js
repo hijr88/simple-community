@@ -18,15 +18,13 @@ function toggleViewComment() {
 
 //댓글 리스트 불러오기
 async function loadComment(page) {//페이지 번호
-    const articleNo = document.querySelector('#articleNo').value; //글번호
+    const articleNo = document.querySelector('#post-id').value; //글번호
     const totalCommentCount = document.querySelector('#total-comment-count'); //화면에 표시 할 댓글 총개수
     let map;  //서버에서 응답한 map
-    try {
-        const response = await fetch(`${getRoot()}/comment/${articleNo}?p=${page}`, {headers: {'Content-Type': 'application/json'}}) //요청
-        map = await response.json();
-    } catch (e) {
-        alert('request error');
-    }
+
+    const response = await fetch(`${getRoot()}/comment/${articleNo}?p=${page}`, {headers: {'Content-Type': 'application/json'}}) //요청
+    map = await response.json();
+
     if (document.querySelector('#more-comment') !== null) //더보기 버튼이 존재하면 삭제하기
         document.querySelector('#more-comment').remove();
 
@@ -343,20 +341,22 @@ function deleteComment(a) { //삭제 버튼
 }
 
 //추천수
-function upRecommend() {
-    const articleNo = document.querySelector('#articleNo').value;
-    fetch(`${getRoot()}/boards/${articleNo}/recommend`)
-        .then(response => response.text())
-        .then(text => {
-            if (text === '1') {
-                const recommendCount = document.querySelector('#recommend-count');
-                const number = Number(recommendCount.textContent) + 1;
-                recommendCount.textContent = number.toString()
-            } else {
-                showAlert('info', '이미 추천하였습니다.', true);
-            }
-        });
+async function upRecommend() {
+    const postId = document.querySelector('#post-id').value;
+    const response = await fetch(`${getRoot()}/api/posts/${postId}/recommend`);
 
+    if (!response.ok) {
+        alert('Server Error!!')
+        return;
+    }
+    const responseText = await response.text();
+    if (responseText === '1') {
+        const recommendCount = document.querySelector('#recommend-count');
+        const number = Number(recommendCount.textContent) + 1;
+        recommendCount.textContent = number.toString()
+    } else {
+        showAlert('info', '이미 추천하였습니다.', true);
+    }
 }
 
 async function deleteBoard(articleNo) { //글번호

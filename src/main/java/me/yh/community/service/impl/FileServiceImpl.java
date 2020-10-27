@@ -9,10 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 
 @Service
 public class FileServiceImpl implements FileService {
@@ -84,6 +81,27 @@ public class FileServiceImpl implements FileService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public void download(HttpServletResponse response, File file, String originalFileName) throws IOException {
+
+        if (originalFileName == null) {
+            originalFileName = file.getName();
+        }
+        response.addHeader("Content-disposition", "attachment; fileName=" + Utils.urlEncode(originalFileName));
+
+        OutputStream out = response.getOutputStream();
+        FileInputStream in = new FileInputStream(file);
+        byte[] buffer = new byte[1024 * 8];
+        while (true) {
+            int count = in.read(buffer); // 버퍼에 읽어들인 문자개수
+            if (count == -1)             // 버퍼의 마지막에 도달했는지 체크
+                break;
+            out.write(buffer, 0, count);
+        }
+        in.close();
+        out.close();
     }
 
     /**

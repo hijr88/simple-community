@@ -1,6 +1,7 @@
 package me.yh.community.api;
 
 import lombok.RequiredArgsConstructor;
+import me.yh.community.repository.PostRepository;
 import me.yh.community.service.PostService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +16,7 @@ import java.security.Principal;
 @RequestMapping("/api/posts")
 public class PostApiController {
 
+    private final PostRepository postRepository;
     private final PostService postService;
 
     /**
@@ -46,4 +48,18 @@ public class PostApiController {
         }
     }
 
+    /**
+     * 게시판 상세보기에서 공개 비공개 처리
+     * @param postId 게시글 번호
+     *
+     */
+    @PutMapping(path = "/{postId}/edit/pub", consumes = "text/plain")
+    public ResponseEntity<Boolean> postChangePub(@PathVariable long postId, @RequestBody String bool) {
+
+        boolean pub = Boolean.parseBoolean(bool);
+        System.out.println(postId +", "+ bool );
+        postRepository.changePubById(postId, pub);
+
+        return ResponseEntity.ok(true);
+    }
 }

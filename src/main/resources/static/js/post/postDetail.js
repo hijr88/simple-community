@@ -256,23 +256,30 @@ async function addComment(button) { //댓글추가하기   댓글등록 버튼
         showAlert('danger', '내용을 입력해주세요.', true);
         return;
     }
-    const articleNo = document.querySelector('#ano').value;  //글번호
+    const postId = document.querySelector('#post-id').value;  //글번호
     const cno = button.attributes.getNamedItem('data-cno').value;  // 답글 쓰기 위한 댓글 번호
     const content = textArea.value.trim();
     const comment = {
-        articleNo: articleNo,
+        postId: postId,
         content: content,
         parent: cno
     }
-    const response = await fetch(`${getRoot()}/comment`, {  // 댓글 서버 전송
-        method: 'POST',
+    const response = await fetch(`${getRoot()}/api/comments`, {  // 댓글 서버 전송
+        method: 'post',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(comment)
     });
+    if (!response.ok) {
+        alert('Server Error!');
+        return;
+    }
     const responseText = await response.text();  //응답코드
-    if (responseText === '1') {
+    if (responseText === '400') {
+        alert('입력이 잘못 되었습니다.');
+    }
+    else if (responseText === '1') {
         if (cno === '0') {         // 게시글에 대한 댓글일경우 전체 새로고침? => no
             blurTextArea(textArea);
             const ul = document.querySelector('#comment-list');
@@ -376,21 +383,22 @@ async function deletePost(postId) { //글번호
     }
 }
 
-async function disableBoard(articleNo) {
+async function disablePost(postId) {
     if (!confirm('비공개 하시겠습니까?')) return;
 
-    const response = await fetch(`${articleNo}/edit/pub`, {
+    const response = await fetch(`/api/posts/${postId}/edit/pub`, {
         method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({pub: 0})
+        headers: {'Content-Type': 'text/plain'},
+        body: false
     });
-    if (response.status === 200) {
-        const text = await response.text();
-        if (text === 'true')
-            location.href = `${getRoot()}/boards`;
-        else
-            alert('다시 시도 해주세요.');
-    } else {
-        alert('disable, Error');
+    if (!response.ok) {
+        alert('Server Error!!')
+        return;
     }
+
+    const text = await response.text();
+    if (text === 'true')
+        location.href = `${getRoot()}/posts`;
+    else
+        alert('다시 시도 해주세요.');
 }

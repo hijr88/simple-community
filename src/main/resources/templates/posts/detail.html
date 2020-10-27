@@ -54,7 +54,7 @@
             <tr th:if="${#authorization.expression('hasRole(''ADMIN'')') || #authentication.name == p.memberId}">
                 <td colspan="2" class="py-3 d-flex justify-content-around">
                     <!--관리자 이상만 비공개 처리 가능-->
-                    <input type="button" value="비공개하기" class="btn btn-purple" th:onclick="|disableBoard(${p.postId});|" sec:authorize-expr="hasRole('ADMIN')">
+                    <input type="button" value="비공개하기" class="btn btn-purple" th:onclick="|disablePost(${p.postId});|" sec:authorize-expr="hasRole('ADMIN')">
                     <!--본인이 쓴 글만 수정 가능-->
                     <a th:href="@{|${p.postId}/edit|}" class="btn btn-purple" th:if="${#authentication.name == p.memberId}">수정하기</a>
                     <input type="button" value="삭제하기" class="btn btn-purple" th:onclick="|deletePost(${p.postId});|">

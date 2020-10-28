@@ -2,6 +2,7 @@ package me.yh.community.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import me.yh.community.dto.post.PostDetailDto;
+import me.yh.community.dto.post.PostPage;
 import me.yh.community.dto.post.PostRequestDto;
 import me.yh.community.entity.Member;
 import me.yh.community.entity.Post;
@@ -31,8 +32,19 @@ public class PostServiceImpl implements PostService {
     private final PostRecommendRepository postRecommendRepository;
     private final String SE = FileService.SE;
 
-    //TODO 게시판 리스트
+    @Override
+    public PostPage findPostList(PostPage page) {
+        page.setContent(postRepository.findPostList(page));
 
+        Long totalCount = postRepository.countPostList(page);
+        page.setTotalCount(totalCount);
+
+        long pageMaxNum =  (long) Math.ceil( (totalCount /10.0) );
+        pageMaxNum = pageMaxNum == 0 ? 1 : pageMaxNum;
+        page.setPageMaxNum(pageMaxNum);
+
+        return page;
+    }
 
     @Transactional
     @Override

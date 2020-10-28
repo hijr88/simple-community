@@ -1,8 +1,10 @@
 package me.yh.community.repository.impl;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import me.yh.community.Utils;
 import me.yh.community.dto.post.*;
+import me.yh.community.entity.QComment;
 import me.yh.community.entity.QPostFile;
 import me.yh.community.entity.QPostRecommend;
 import me.yh.community.repository.custom.PostRepositoryCustom;
@@ -24,19 +26,39 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<PostListDto> findPostList() {
+    public List<PostListDto> findPostList(PostPage page) {
+
+        long offset = (page.getCurrent() -1) * 10;
 
         QPostRecommend recommend = postRecommend;
+        QComment comment = QComment.comment;
 
         return queryFactory
-                .select(new QPostListDto(post.id, post.title, post.member.nickname, post.createDate, recommend.count(), post.hit, post.dept))
+                .select(new QPostListDto(post.id, post.title, post.member.nickname, post.createDate, recommend.countDistinct(), post.hit, post.dept, comment.countDistinct() ) )
                 .from(post)
                 .join(post.member, member)
                 .leftJoin(recommend).on(post.id.eq(recommend.postId))
-                .where(post.delete.eq(false))
+                .leftJoin(comment).on(post.id.eq(comment.postId))
+                .where(
+                        post.delete.eq(false),
+                        fieldEq(page)
+                )
                 .groupBy(post.id, post.title, post.member.nickname, post.createDate, post.hit, post.dept)
                 .orderBy(post.groupNo.desc(), post.groupOrder.asc())
+                .offset(offset).limit(10)
                 .fetch();
+    }
+
+    @Override
+    public Long countPostList(PostPage page) {
+        return queryFactory
+                .from(post)
+                .join(post.member, member)
+                .where(
+                        post.delete.eq(false),
+                        fieldEq(page)
+                )
+                .fetchCount();
     }
 
     @Override
@@ -46,7 +68,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         QPostFile file = postFile;
 
         PostDetailDto postDetail = queryFactory
-                .select(new QPostDetailDto(post.id, post.title, post.content, member.id, member.nickname, member.profileImage, post.createDate, post.hit, recommend.count(), file.fileName, file.originalFileName))
+                .select(new QPostDetailDto(post.id, post.title, post.content, member.id, member.nickname, member.profileImage, post.createDate, post.hit, recommend.countDistinct(), file.fileName, file.originalFileName))
                 .from(post)
                 .join(post.member, member)
                 .leftJoin(post.files, file)
@@ -76,5 +98,18 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .leftJoin(post.files, file)
                 .where(post.id.eq(id).and(post.pub.eq(true)).and(post.delete.eq(false)))
                 .fetchOne();
+    }
+
+
+
+    private BooleanExpression fieldEq(PostPage page) {
+        if (page.getQuery().equals(""))
+            return null;
+        if (page.getField().equals("title")) {
+            return post.title.contains(page.getQuery());
+        } else if (page.getField().equals("writer")) {
+            return member.nickname.contains(page.getQuery());
+        }
+        return null;
     }
 }

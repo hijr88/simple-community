@@ -40,15 +40,15 @@ public class PostController {
     @PreAuthorize("permitAll()")
     @GetMapping(path = {"","/"})
     public String index(Model model, PostPage page){
-        List<PostListDto> list = postRepository.findPostList();
 
+        PostPage result = postService.findPostList(page);
+
+        List<PostListDto> list = result.getContent();
         List<Boolean> isNow = isNow(list);
-        
-        model.addAttribute("list",list);
-        model.addAttribute("isNow",isNow);
 
-        System.out.println(page);
+        model.addAttribute("isNow",isNow);
         model.addAttribute("page", page);
+        System.out.println(page);
 
         return "posts/list";
     }

@@ -20,7 +20,7 @@ public class PostListDto {
     private Long comment;
 
     @QueryProjection
-    public PostListDto(Long id, String title, String writer, LocalDateTime createDate, Long recommend, Long hit, int dept) {
+    public PostListDto(Long id, String title, String writer, LocalDateTime createDate, Long recommend, Long hit, int dept, Long comment) {
         this.id = id;
         this.title = title;
         this.writer = writer;
@@ -28,5 +28,6 @@ public class PostListDto {
         this.recommend = recommend;
         this.hit = hit;
         this.dept = dept;
+        this.comment = comment;
     }
 }

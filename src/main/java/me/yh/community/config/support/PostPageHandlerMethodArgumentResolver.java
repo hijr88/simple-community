@@ -15,7 +15,7 @@ public class PostPageHandlerMethodArgumentResolver implements HandlerMethodArgum
 
     String field;
     String query;
-    long num;
+    long page;  //현재 페이지 번호
 
     Set<String> fieldOption = new HashSet<>(Arrays.asList("title", "writer"));
 
@@ -43,16 +43,16 @@ public class PostPageHandlerMethodArgumentResolver implements HandlerMethodArgum
 
         String page_ = webRequest.getParameter("p");
         if (page_ == null) {
-            num = 1;
+            page = 1;
         } else {
             try { // page_ 문자열이 숫자로 변환이 안되거나 1보다 작을 경우 1로 초기화
-                num = Long.parseLong(page_);
-                if (num < 1) num = 1;
+                page = Long.parseLong(page_);
+                if (page < 1) page = 1;
             } catch (NumberFormatException e) {
-                num = 1;
+                page = 1;
             }
         }
 
-        return new PostPage(field, query, num);
+        return new PostPage(field, query, page, null, null, null);
     }
 }

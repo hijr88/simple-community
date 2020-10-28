@@ -44,7 +44,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                    <tr class="text-center" th:each="p, st: ${list}">
+                    <tr class="text-center" th:each="p, st: ${page.content}">
                         <td>
                             <span th:text="${p.id}">글 번호</span>
                         </td>
@@ -52,7 +52,7 @@
                             <a th:href="@{|/posts/${p.id}}" th:style="|margin-left: ${p.dept * 14}px;|">
                                 <span class="icon-reply" th:if="${p.dept != 0}"></span><span th:text="${p.title}"></span>
                             </a>
-                            <span class="reply-count">2</span>
+                            <span class="reply-count" th:if="${p.comment != 0}" th:text="${p.comment}">댓글 개수</span>
                         </td>
                         <td>
                             <span th:text="${p.writer}"></span>
@@ -64,7 +64,7 @@
                         <td><span th:text="${p.hit}">조회수</span></td>
                     </tr>
 
-                    <tr class="text-center" th:if="${list.size() == 0}">
+                    <tr class="text-center" th:if="${page.content.size() == 0}">
                         <td colspan="6">검색된 결과가 없습니다.</td>
                     </tr>
                 </tbody>
@@ -76,37 +76,44 @@
                     <button class="btn btn-outline-danger">글쓰기</button>
                 </a>
             </div>
-            <h5 class="float-right"><span class="current-page-num">${p}</span>/<span
-                    class="font-weight-normal">${pageMaxNum}</span></h5>
+            <h5 class="float-right">
+                <span class="current-page-num" th:text="${page.current}">현재 페이지 번호</span>/<span class="font-weight-normal" th:text="${page.pageMaxNum}">마지막 페이지 번호</span>
+            </h5>
         </div>
     </section>
 
     <section class="container my-2 text-center clearfix">
-        <c:set var="startNum" value="${p-2}"/>
         <nav class="pager">
             <ul class="pagination">
-                <c:if test="${p != 1}">
-                    <li class="page-item"><a class="page-link" href="?f=${f}&q=${param.q}&p=1"><i
-                            class="fas fa-angle-double-left"></i></a></li>
-                    <li class="page-item"><a class="page-link" href="?f=${f}&q=${param.q}&p=${p-1}"><i
-                            class="fas fa-angle-left"></i></a></li>
-                </c:if>
-                <c:forEach var="i" begin="0" end="4">
-                    <c:set var="currentPageNum" value="${startNum + i}"/>
-                    <c:if test="${currentPageNum > 0 and currentPageNum <= pageMaxNum}">
-                        <li class="page-item ${currentPageNum == p ? "active" : ""}">
-                        <a class="page-link" href="<c:if test="${currentPageNum == p}">javascript:;</c:if>
-                    <c:if test="${currentPageNum != p}">?f=${f}&q=${param.q}&p=${currentPageNum}</c:if> ">${currentPageNum}
-                    </a>
+                <th:block th:if="${page.current != 1}">
+                    <li class="page-item">
+                        <a class="page-link" th:href="@{/posts(f=${page.field},q=${page.query},p=1)}">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
                     </li>
-                    </c:if>
-                </c:forEach>
-                <c:if test="${p < pageMaxNum}">
-                    <li class="page-item"><a class="page-link" href="?f=${f}&q=${param.q}&p=${p+1}"><i
-                            class="fas fa-angle-right"></i></a></li>
-                    <li class="page-item"><a class="page-link" href="?f=${f}&q=${param.q}&p=${pageMaxNum}"><i
-                            class="fas fa-angle-double-right"></i></a></li>
-                </c:if>
+                    <li class="page-item">
+                        <a class="page-link" th:href="@{/posts(f=${page.field},q=${page.query}, p=${page.current -1})}">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    </li>
+                </th:block>
+                <th:block th:each="i, st: ${#numbers.sequence(page.current -2 , page.current +2)}">
+                    <li class="page-item" th:if="${st.count > 0 && st.count <= page.pageMaxNum}" th:classappend="${st.count == page.current} ? 'active' ">
+                        <a class="page-link" th:href= "@{(${st.count == page.current} ? 'javascript:;' : |?f=${page.field}&q=${page.query}&p=${st.count}| )}" th:text="${st.count}"></a>
+                    </li>
+                </th:block>
+                <th:block th:if="${page.current < page.pageMaxNum}">
+                    <li class="page-item">
+                        <a class="page-link" th:href="@{/posts(f=${page.field},q=${page.query}, p=${page.current+1})}">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" th:href="@{/posts(f=${page.field},q=${page.query}, p=${page.pageMaxNum})}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                </th:block>
             </ul>
         </nav>
     </section>

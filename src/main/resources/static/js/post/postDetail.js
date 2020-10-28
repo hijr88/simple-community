@@ -18,19 +18,22 @@ function toggleViewComment() {
 
 //댓글 리스트 불러오기
 async function loadComment(page) {//페이지 번호
-    const articleNo = document.querySelector('#post-id').value; //글번호
+    const postId = document.querySelector('#post-id').value; //글번호
     const totalCommentCount = document.querySelector('#total-comment-count'); //화면에 표시 할 댓글 총개수
-    let map;  //서버에서 응답한 map
 
-    const response = await fetch(`${getRoot()}/comment/${articleNo}?p=${page}`, {headers: {'Content-Type': 'application/json'}}) //요청
-    map = await response.json();
+    const response = await fetch(`${getRoot()}/api/comments/${postId}?p=${page}`, {headers: {'Content-Type': 'application/json'}}); //요청
+    if (!response.ok) {
+        alert('Server Error');
+        return;
+    }
+    const commentInfo = await response.json();
 
     if (document.querySelector('#more-comment') !== null) //더보기 버튼이 존재하면 삭제하기
         document.querySelector('#more-comment').remove();
 
-    const list = map.list;   //댓글 리스트
-    const count = map.count; //답글 제외한 댓글 개수
-    totalCommentCount.textContent = map.totalCount; //댓글 총 개수
+    const list = commentInfo.list;   //댓글 리스트
+    const count = commentInfo.count; //답글 제외한 댓글 개수
+    totalCommentCount.textContent = commentInfo.totalCount; //댓글 총 개수
 
     const ul = document.querySelector('#comment-list');
     const pno = document.createAttribute("data-pno");
@@ -49,24 +52,25 @@ async function loadComment(page) {//페이지 번호
     list.forEach((comment, i) => {
         if ((seq + i) <= lastSeq) return;
 
-        const regDate_ = comment.regDate;
-        const regDate = `${regDate_.year.toString().substring(2)
-        }.${regDate_.monthValue < 10 ? `0${regDate_.monthValue}` : regDate_.monthValue
-        }.${regDate_.dayOfMonth < 10 ? `0${regDate_.dayOfMonth}` : regDate_.dayOfMonth
-        }. ${regDate_.hour < 10 ? `0${regDate_.hour}` : regDate_.hour
-        }:${regDate_.minute < 10 ? `0${regDate_.minute}` : regDate_.minute
-        }:${regDate_.second < 10 ? `0${regDate_.second}` : regDate_.second}`; //날짜+시간
+        const date = new Date(comment.createDate);
+        const year = date.getFullYear().toString().substring(0,2);
+        const month =   ( (date.getMonth()+1) < 10 ? '0' +(date.getMonth()+1) : date.getMonth()+1);
+        const dayOfMonth = date.getDate()     < 10 ? '0' + date.getDate()     : date.getDate();
+        const hour =       date.getHours()    < 10 ? '0' + date.getHours()    : date.getHours();
+        const minute =     date.getMinutes()  < 10 ? '0' + date.getMinutes()  : date.getMinutes();
+        const second =     date.getSeconds()  < 10 ? '0' + date.getSeconds()  : date.getSeconds();
+        const createDate = `${year}.${month}.${dayOfMonth} ${hour}:${minute}:${second}`;
 
-        const li = `<li class="list-group-item p-2" data-cno="${comment.cno}" data-seq="${seq + i}">
+        const li = `<li class="list-group-item p-2" data-cno="${comment.id}" data-seq="${seq + i}">
                        <div class="comment-info">
-                            <img src="${getRoot()}/file/thumb/profile/${comment.id}/${comment.profileImage == null ? "none" : encodeURI(comment.profileImage)}/size?w=30&h=30" width="30" height="30"
+                            <img src="${getRoot()}/files/thumb/profile/${comment.memberId}/${comment.profileImage}?w=30&h=30" width="30" height="30"
                                  alt="프로필이미지" class="rounded-circle" width="30" height="30">
-                            <span class="comment-writer text-muted">${comment.name}(${comment.id})</span>
+                            <span class="comment-writer text-muted">${comment.nickname}(${comment.memberId})</span>
                             <span class="mx-2" style="color: #e2d7df;">|</span>
-                            <span class="comment-regdate text-muted">${regDate}</span>
+                            <span class="comment-regdate text-muted">${createDate}</span>
         
-                            ${(userName === comment.id || isAdmin === 'true') && comment.pub === true ?
-            `<!-- 작성자 or 관리자 -->
+                            ${(userName === comment.memberId || isAdmin === 'true') && comment.delete === false ?
+                                `<!-- 작성자 or 관리자 -->
                                 <span class="float-right comment-option">
                                 <div class="dropdown">
                                 <!--Trigger-->
@@ -79,12 +83,12 @@ async function loadComment(page) {//페이지 번호
                                 </div>
                                 </div>
                                 </span>` : ''
-        }
+                            }
                         </div>
                         <hr class="my-1">
-                        <p class="comment-content my-1" style="white-space: pre-wrap;">${comment.pub === true ? comment.content : '<i class="fas fa-exclamation-circle mr-1" style="color: #fbbd0d"></i><span style="color: #d0d0d0">삭제된 댓글 입니다.</span>'}</p>
+                        <p class="comment-content my-1" style="white-space: pre-wrap;">${comment.delete === false ? comment.content : '<i class="fas fa-exclamation-circle mr-1" style="color: #fbbd0d"></i><span style="color: #d0d0d0">삭제된 댓글 입니다.</span>'}</p>
                         <a class="small text-dark" onclick="showReplyComment(this);" style="cursor: pointer">
-                            <span class="reply-txt mr-1">답글</span><span class="reply-cnt font-weight-bold">${comment.count}</span>
+                            <span class="reply-txt mr-1">답글</span><span class="reply-cnt font-weight-bold">${comment.childCount}</span>
                             <input type="radio" name="reply">
                         </a>
                     </li>`
@@ -113,7 +117,7 @@ async function showReplyComment(a) {
 //댓글에 대한 답글 얻어오기
 function loadReplyComment(cno, page) { // 댓글번호, 페이지 번호
     return new Promise((resolve, reject) => {
-        fetch(`${getRoot()}/comment/reply/${cno}?p=${page}`, {
+        fetch(`${getRoot()}/api/comments/reply/${cno}?p=${page}`, {
             headers: {'Content-Type': 'application/json'}
         })
             .then(response => {
@@ -151,7 +155,7 @@ async function toggleReplyComment() {
 
 //댓글번호에 해당하는 페이지 가져와 추가하기
 async function appendReplyComment(cno, page) { //ul, 댓글번호, 페이지
-    const root = document.querySelector(`li[data-cno='${cno}']`); //댓글번호에 해당하는 최상위 li태그
+    const root = document.querySelector(` li[data-cno='${cno}']`); //댓글번호에 해당하는 최상위 li태그
     const ul = root.lastElementChild; //댓글아래에 추가할 대댓글 리스트
 
     const pno = document.createAttribute("data-pno"); //펼쳐진 페이지 번호
@@ -190,18 +194,26 @@ async function appendReplyComment(cno, page) { //ul, 댓글번호, 페이지
     //for(const c of list){
     list.forEach((c, i) => {
         if (seq + i <= lastSeq) return;
-        const regDate_ = c.regDate;
-        const regDate = `${regDate_.year.toString().substring(2)}.${regDate_.monthValue}.${regDate_.dayOfMonth}. ${regDate_.hour}:${regDate_.minute}:${regDate_.second}`; //날짜+시간
-        const li = `<li class="list-group-item p-2" data-cno="${c.cno}" data-seq="${seq + i}">
+
+        const date = new Date(c.createDate);
+        const year = date.getFullYear().toString().substring(0,2);
+        const month =   ( (date.getMonth()+1) < 10 ? '0' +(date.getMonth()+1) : date.getMonth()+1);
+        const dayOfMonth = date.getDate()     < 10 ? '0' + date.getDate()     : date.getDate();
+        const hour =       date.getHours()    < 10 ? '0' + date.getHours()    : date.getHours();
+        const minute =     date.getMinutes()  < 10 ? '0' + date.getMinutes()  : date.getMinutes();
+        const second =     date.getSeconds()  < 10 ? '0' + date.getSeconds()  : date.getSeconds();
+        const createDate = `${year}.${month}.${dayOfMonth} ${hour}:${minute}:${second}`;
+
+        const li = `<li class="list-group-item p-2" data-cno="${c.id}" data-seq="${seq + i}">
                                 <div class="comment-info">
-                                    <img src="${getRoot()}/file/thumb/profile/${c.id}/${c.profileImage == null ? "none" : encodeURI(c.profileImage)}/size?w=25&h=25" width="25" height="25"
+                                    <img src="${getRoot()}/files/thumb/profile/${c.memberId}/${c.profileImage}?w=25&h=25" width="25" height="25"
                                         alt="프로필이미지" class="rounded-circle" width="25" height="25">
-                                    <span class="comment-writer text-muted">${c.name}(${c.id})</span>
+                                    <span class="comment-writer text-muted">${c.nickname}(${c.memberId})</span>
                                     <span class="mx-2" style="color: #e2d7df;">|</span>
-                                    <span class="comment-regdate text-muted">${regDate}</span>
+                                    <span class="comment-regdate text-muted">${createDate}</span>
                                     
-                                    ${(userName === c.id || isAdmin === 'true') && c.pub === true ?
-            `<!-- 작성자 or 관리자 -->
+                                    ${(userName === c.memberId || isAdmin === 'true') && c.delete === false ?
+                                        `<!-- 작성자 or 관리자 -->
                                         <span class="float-right comment-option">
                                         <div class="dropdown">
                                         <!--Trigger-->
@@ -214,10 +226,10 @@ async function appendReplyComment(cno, page) { //ul, 댓글번호, 페이지
                                         </div>
                                         </div>
                                         </span>` : ''
-        }   
+                                    }   
                                 </div>
                                 <hr class="my-1">
-                                <p class="comment-content my-1" style="white-space: pre-wrap">${c.pub === true ? c.content : '<i class="fas fa-exclamation-circle mr-1" style="color: #fbbd0d"></i><span style="color: #d0d0d0">삭제된 댓글 입니다.</span>'}</p>
+                                <p class="comment-content my-1" style="white-space: pre-wrap">${c.delete === false ? c.content : '<i class="fas fa-exclamation-circle mr-1" style="color: #fbbd0d"></i><span style="color: #d0d0d0">삭제된 댓글 입니다.</span>'}</p>
                              </li>`
         appendHtml(ul, li);
     });
@@ -328,23 +340,25 @@ function cancelComment(button) { //취소버튼
     blurTextArea(ta);
 }
 
-function deleteComment(a) { //삭제 버튼
+async function deleteComment(a) { //삭제 버튼
     let li = a;
     for (; (li.nodeName !== 'LI'); li = li.parentElement) ;
     const cno = li.attributes.getNamedItem('data-cno').value;  //댓글 번호 꺼내기
 
-    fetch(`${getRoot()}/comment/${cno}`, { // 요청
+    const response = await fetch(`${getRoot()}/api/comments/${cno}`, { // 요청
         method: 'DELETE',
         headers: {'Content-Type': 'text/plain'}
-    })
-        .then(response => response.text())
-        .then(text => {
-            if (text === '1') { // 서버 처리가 완료 된경우
-                const content = li.querySelector('.comment-content');
-                //삭제된 메시지로 바꾸기
-                content.innerHTML = '<i class="fas fa-exclamation-circle mr-1" style="color: #fbbd0d"></i><span style="color: #d0d0d0">삭제된 댓글 입니다.</span>';
-            }
-        })
+    });
+    if (!response.ok) {
+        alert('Server Error!');
+        return;
+    }
+    const text = await response.text();
+    if (text === '1') {
+        const content = li.querySelector('.comment-content');
+        //삭제된 메시지로 바꾸기
+        content.innerHTML = '<i class="fas fa-exclamation-circle mr-1" style="color: #fbbd0d"></i><span style="color: #d0d0d0">삭제된 댓글 입니다.</span>';
+    }
 }
 
 //추천수

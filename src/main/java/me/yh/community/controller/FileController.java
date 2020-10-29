@@ -73,9 +73,6 @@ public class FileController {
         return new ResponseEntity<>("Good", HttpStatus.OK);
     }
 
-
-
-
     @Data
     static class FileInfo {
         private String type;      // profile","board","gallery

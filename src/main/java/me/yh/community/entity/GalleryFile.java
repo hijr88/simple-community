@@ -10,30 +10,33 @@ import javax.persistence.*;
 @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 
-@SequenceGenerator(name="seq_gen", sequenceName="post_file_seq",
+@SequenceGenerator(name="seq_gen", sequenceName="gallery_file_seq",
         initialValue=1, allocationSize=1)
-@Table(name = "post_file")
+@Table(name = "gallery_file")
 @Entity
-public class PostFile {
+public class GalleryFile {
 
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_gen")
-    @Column(name = "post_file_id")
+    @Column(name = "gallery_file_id")
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "post_id")
-    private Post post;
+    @JoinColumn(name = "gallery_id")
+    private Gallery gallery;
 
+    @Column(length = 1000, nullable = false)
     private String fileName;
 
+    @Column(length = 1000, nullable = false)
     private String originalFileName;
 
+    @Column(nullable = false)
     private int fileSize;
 
-    public PostFile(Post post, String fileName, String originalFileName, long fileSize) {
-        this.post = post;
+    public GalleryFile(Gallery gallery, String fileName, String originalFileName, int fileSize) {
+        this.gallery = gallery;
         this.fileName = fileName;
         this.originalFileName = originalFileName;
-        this.fileSize = (int) fileSize;
+        this.fileSize = fileSize;
     }
 }

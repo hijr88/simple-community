@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
-import java.io.File;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -34,9 +33,9 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostPage findPostList(PostPage page) {
-        page.setContent(postRepository.findPostList(page));
+        page.setContent(postRepository.findListByPageAndPub(page,true));
 
-        Long totalCount = postRepository.countPostList(page);
+        Long totalCount = postRepository.countListByPageAndPub(page, true);
         page.setTotalCount(totalCount);
 
         long pageMaxNum =  (long) Math.ceil( (totalCount /10.0) );

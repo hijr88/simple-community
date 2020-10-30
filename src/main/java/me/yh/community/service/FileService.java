@@ -23,4 +23,6 @@ public interface FileService {
     boolean deleteFile(String filePath);
 
     boolean deleteFolder(String folderPath);
+
+    void inlineView(HttpServletResponse response, File file, String originalFileName) throws IOException;
 }

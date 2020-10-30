@@ -26,7 +26,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<PostListDto> findPostList(PostPage page) {
+    public List<PostListDto> findListByPageAndPub(PostPage page, boolean pub) {
 
         long offset = (page.getCurrent() -1) * 10;
 
@@ -40,6 +40,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .leftJoin(recommend).on(post.id.eq(recommend.postId))
                 .leftJoin(comment).on(post.id.eq(comment.postId))
                 .where(
+                        post.pub.eq(pub),
                         post.delete.eq(false),
                         fieldEq(page)
                 )
@@ -50,11 +51,12 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public Long countPostList(PostPage page) {
+    public Long countListByPageAndPub(PostPage page, boolean pub) {
         return queryFactory
                 .from(post)
                 .join(post.member, member)
                 .where(
+                        post.pub.eq(pub),
                         post.delete.eq(false),
                         fieldEq(page)
                 )

@@ -123,21 +123,20 @@ function validateGallery(form) {
 }
 
 //폼과 input 생성 하여 추가 하고 서브밋
-function deleteGallery(gno) {
+async function deleteGallery(id) {
     if (!confirm('정말 삭제하시겠습니까?\n삭제하면 복구가 불가능합니다.')) return;
 
-    const form = document.createElement('form');
-    form.action = `${getRoot()}/galleries/${gno}`;
-    form.method = 'POST';
-
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = '_method';
-    input.value = 'delete';
-    form.appendChild(input);
-
-    document.body.appendChild(form);
-    form.submit();
+    const response = await fetch(`${getRoot()}/api/galleries/${id}`,{
+        method: 'delete'
+    });
+    if (!response.ok) {
+        showAlert('danger',"Server Error", false);
+        return;
+    }
+    const text = await response.text();
+    if (text === 'true') {
+        location.href = `${getRoot()}/galleries`;
+    }
 }
 
 async function disableGallery(gno) {

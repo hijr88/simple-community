@@ -30,12 +30,12 @@ public class FileServiceImpl implements FileService {
         int oHeight = oImg.getHeight();
         // 원본 너비를 기준으로 하여 만들고자하는 썸네일의 비율로 높이를 계산한다.
         int nWidth = oWidth;
-        int nHeight = (oWidth / width) * height;
+        int nHeight = (int) ((oWidth / (double)width) * height);
 
         // 계산된 높이가 원본보다 높다면 crop 이 안되므로
         // 원본 높이를 기준으로 썸네일의 비율로 너비를 계산한다.
         if (nHeight > oHeight) {
-            nWidth = (oHeight / height) * width;
+            nWidth = (int) ((oHeight / (double)height) * width);
             nHeight = oHeight;
         }
         // 계산된 크기로 원본 이미지를 가운데에서 crop 한다.
@@ -91,12 +91,29 @@ public class FileServiceImpl implements FileService {
         }
         response.addHeader("Content-disposition", "attachment; fileName=" + Utils.urlEncode(originalFileName));
 
+        sendFileStream(response, file);
+    }
+
+    @Override
+    public void inlineView(HttpServletResponse response, File file, String originalFileName) throws IOException {
+        if (originalFileName == null) {
+            originalFileName = file.getName();
+        }
+        response.addHeader("Content-disposition", "inline; fileName=" + Utils.urlEncode(originalFileName));
+        String fileName = file.getName();
+        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
+        response.setContentType(String.format("image/%s", fileExtension));
+
+        sendFileStream(response, file);
+    }
+
+    private void sendFileStream(HttpServletResponse response, File file) throws IOException {
         OutputStream out = response.getOutputStream();
         FileInputStream in = new FileInputStream(file);
         byte[] buffer = new byte[1024 * 8];
         while (true) {
             int count = in.read(buffer); // 버퍼에 읽어들인 문자개수
-            if (count == -1)             // 버퍼의 마지막에 도달했는지 체크
+            if (count == -1) // 버퍼의 마지막에 도달했는지 체크
                 break;
             out.write(buffer, 0, count);
         }

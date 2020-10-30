@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <title>갤러리</title>
+</head>
+<main class="mb-5 px-3 clearfix" id="gallery-index" layout:fragment="content">
+    <nav class="px-3 mb-3">
+        <a href="galleries/new" class="btn btn-purple">이미지 올리기</a>
+    </nav>
+
+    <section id="gallery-img" th:if="${page.content.size() != 0}">
+        <ul>
+            <li th:each="g : ${page.content}">
+                <div class="responsive-gallery">
+                    <div class="gallery">
+                        <a th:href="@{|/galleries/${g.id}}">
+                            <span aria-label="슬라이드" class="multiple" th:if="${g.childCount != 1}"></span>
+                            <img th:src="@{|/files/thumb/gallery/${g.id}/${g.fileName}(w=250,h=250)}" alt="picture">
+                        </a>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </section>
+
+    <section class="container" id="empty" th:if="${page.content.size() == 0}">
+        <div class="text-center">
+            <img th:src= "@{/images/first.png}"/>" alt="first">
+            <h1 class="font-Jua">첫번째 글의 주인공이 되어보세요!</h1>
+        </div>
+    </section>
+
+    <section class="container my-2 text-center">
+        <nav class="pager">
+            <ul class="pagination">
+                <th:block th:if="${page.current != 1}">
+                    <li class="page-item">
+                        <a class="page-link" th:href="@{/galleries(p=1)}">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" th:href="@{|/galleries(p=${page.current -1})}">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    </li>
+                </th:block>
+                <th:block th:each="i, st: ${#numbers.sequence(page.current -2, page.current +2)}">
+                    <li class="page-item" th:if="${st.count > 0 && st.count <= page.current}" th:classappend="${st.count == page.current} ? 'active' ">
+                        <a class="page-link" th:href= "@{(${st.count == page.current} ? 'javascript:;' : |?p=${st.count}| )}" th:text="${st.count}"></a>
+                    </li>
+                </th:block>
+                <th:block th:if="${page.current < page.pageMaxNum}">
+                    <li class="page-item">
+                        <a class="page-link" th:href="@{/galleries(p=${page.current +1})}">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" th:href="@{/galleries(p=${page.pageMaxNum})}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                </th:block>
+            </ul>
+        </nav>
+    </section>
+</main>
+</html>

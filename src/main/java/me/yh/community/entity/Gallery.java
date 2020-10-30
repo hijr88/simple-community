@@ -58,7 +58,7 @@ public class Gallery {
         this.member = member;
     }
 
-    public void changeFiles(GalleryFile file) {
+    public void addFiles(GalleryFile file) {
         this.files.add(file);
         file.setGallery(this);
     }

@@ -33,10 +33,10 @@ public class GalleryFile {
     @Column(nullable = false)
     private int fileSize;
 
-    public GalleryFile(Gallery gallery, String fileName, String originalFileName, int fileSize) {
+    public GalleryFile(Gallery gallery, String fileName, String originalFileName, long fileSize) {
         this.gallery = gallery;
         this.fileName = fileName;
         this.originalFileName = originalFileName;
-        this.fileSize = fileSize;
+        this.fileSize = (int)fileSize;
     }
 }

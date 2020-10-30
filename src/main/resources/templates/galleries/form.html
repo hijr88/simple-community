@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <title th:text="${title}">쓰기/수정</title>
+</head>
+<main class="container" id="gallery-form" layout:fragment="content">
+    <input type="hidden" id="sequence" value="0">
+    <form th:action="@{|/galleries/${action}}" method="post" enctype="multipart/form-data"
+          onsubmit="return validateGallery(this);">
+        <table class="table">
+            <tr class="row">
+                <th class="col-md-2">제목</th>
+                <td class="col-md-10">
+                    <input type="text" name="title" required minlength="1" maxlength="26" size="26"
+                                             class="form-control"
+                                             autocomplete="off" th:value="${g?.title}">
+                </td>
+            </tr>
+            <tr class="row">
+                <th class="col-md-2">이미지</th>
+                <td class="col-md-10">
+                    <button type="button" class="btn btn-light border" onclick="uploadImg();">이미지 추가하기</button>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div id="thumb-list">
+                        <div class="img-box mr-2" th:each="f, st : ${files}">
+                            <i class="far fa-window-close text-danger pointer" data-no="${f.no}"
+                               onclick="removeThumbnail(this)"></i>
+                            <img class="border rounded-circle"
+                                 th:src="@{/files/thumb/gallery/${gId}/${filename}(w=150,h=150)}"
+                                 alt="thumbnail" width="60" height="60">
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" class="py-3 d-flex justify-content-around">
+                    <input type="submit" th:value="${action == 'new' ? '업로드' : '수정하기'}" class="btn btn-purple">
+                    <input type="button" value="취소" class="btn btn-purple" onclick="cancel();">
+                </td>
+            </tr>
+        </table>
+    </form>
+</main>
+<th:block layout:fragment="src">
+    <script th:src="@{/js/commons.js}"></script>
+    <script th:src="@{/js/gallery.js}"></script>
+</th:block>
+</html>

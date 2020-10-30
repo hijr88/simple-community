@@ -1,8 +1,8 @@
 package me.yh.community.config.support;
 
-import me.yh.community.dto.post.PostListDto;
-import me.yh.community.dto.post.PostPage;
-import me.yh.community.repository.PostRepository;
+import me.yh.community.dto.gallery.GalleryListDto;
+import me.yh.community.dto.gallery.GalleryPage;
+import me.yh.community.repository.GalleryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.MethodParameter;
@@ -13,51 +13,30 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Component
-public class PostPageHandlerMethodArgumentResolver implements HandlerMethodArgumentResolver {
+public class GalleryPageHandlerMethodArgumentResolver implements HandlerMethodArgumentResolver {
 
-    private final PostRepository postRepository;
+    private final GalleryRepository galleryRepository;
 
-    public PostPageHandlerMethodArgumentResolver(PostRepository postRepository) {
-        this.postRepository = postRepository;
+    public GalleryPageHandlerMethodArgumentResolver(GalleryRepository galleryRepository) {
+        this.galleryRepository = galleryRepository;
     }
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        //파라미터가 BoardPage 타입일 때
-        return parameter.getParameterType().equals(PostPage.class);
+        return parameter.getParameterType().equals(GalleryPage.class);
     }
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 
-        String field;
-        String query;
-        long page;  //현재 페이지 번호
-        List<PostListDto> list;
+        long page; //페이지 번호
+        List<GalleryListDto> list;
         long totalCount;
-
-        Set<String> fieldOption = new HashSet<>(Arrays.asList("title", "writer"));
-
-        field = webRequest.getParameter("f");
-        if (field == null) {
-            field = "title";
-        }
-        else if (!fieldOption.contains(field)) { //필드명이 유효하지 않은경우 title 로 초기화
-            field = "title";
-        }
-
-        query = webRequest.getParameter("q");
-        if (query == null) {
-            query = "";
-        }
 
         String page_ = webRequest.getParameter("p");
         if (page_ == null) {
@@ -78,18 +57,16 @@ public class PostPageHandlerMethodArgumentResolver implements HandlerMethodArgum
             requestURI = requestURI.substring(0, question);
         log.info("접속한 URI : " + requestURI);
 
-        PostPage postPage = new PostPage(field,query,page);
-
         if (requestURI.contains("/admin")) {
-            list = postRepository.findListByPageAndPub(postPage, false);
-            totalCount = postRepository.countListByPageAndPub(postPage, false);
+            list = galleryRepository.findListByPageAndPub(page, false);
+            totalCount = galleryRepository.countListByPub(false);
         } else {
-            list = postRepository.findListByPageAndPub(postPage, true);
-            totalCount = postRepository.countListByPageAndPub(postPage, true);
+            list = galleryRepository.findListByPageAndPub(page, true);
+            totalCount = galleryRepository.countListByPub(true);
         }
-        long pageMaxNum = (long) Math.ceil((totalCount / 10.0));
+        long pageMaxNum = (long) Math.ceil((totalCount / 40.0));
         pageMaxNum = (pageMaxNum == 0) ? 1 : pageMaxNum;
 
-        return new PostPage(field, query, page, list, totalCount, pageMaxNum);
+        return new GalleryPage(page, list, totalCount, pageMaxNum);
     }
 }

@@ -128,7 +128,7 @@ public class PostController {
 
         boolean result = postRepository.existsByIdAndPub(id, true);
 
-        if (!result) { //부모글이 존재 하지 않으면 에러 처리
+        if (!result) { //글이 존재 하지 않으면 에러 처리
             ra.addFlashAttribute("type","BAD_REQUEST");
             return "redirect:/error-redirect";
         }

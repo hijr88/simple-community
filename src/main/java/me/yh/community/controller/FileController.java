@@ -52,9 +52,35 @@ public class FileController {
                 return new ResponseEntity<>("NOT_FOUND", HttpStatus.NOT_FOUND);
             fileService.toThumbnail(response, file, width, height);
             return new ResponseEntity<>("Good", HttpStatus.OK);
+        } else if(info.getType().equals("gallery")) {
+            filePath = FileService.galleryPath + SE + info.getId() + SE + info.getFileName();
+            File file = new File(filePath);
+            if (!file.exists())
+                return new ResponseEntity<>("NOT_FOUND", HttpStatus.NOT_FOUND);
+            fileService.toThumbnail(response, file, width, height);
+            return new ResponseEntity<>("Good", HttpStatus.OK);
         }
 
         return new ResponseEntity<>("NOT_FOUND", HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * id/이미지 이름 받아서 경로 지정 해주고 썸네일 메서드 호출
+     */
+    @GetMapping("/original/{type}/{id}/{fileName}")
+    public ResponseEntity<String> originalImage(HttpServletResponse response
+            , @ModelAttribute FileInfo info) throws Exception {
+        String filePath;
+
+        if (info.getType().equals("gallery")) {
+            filePath = FileService.galleryPath + SE + info.getId() + SE + info.fileName;
+
+            File file = new File(filePath);
+            if (!file.exists())
+                return new ResponseEntity<>("NOT_FOUND", HttpStatus.NOT_FOUND);
+            fileService.inlineView(response, file, info.o);
+        }
+        return ResponseEntity.ok("200");
     }
 
     @GetMapping("/down/{type}/{id}/{fileName}")

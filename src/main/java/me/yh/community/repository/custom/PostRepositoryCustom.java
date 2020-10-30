@@ -9,8 +9,8 @@ import java.util.List;
 
 public interface PostRepositoryCustom {
 
-    List<PostListDto> findPostList(PostPage page);
-    Long countPostList(PostPage page);
+    List<PostListDto> findListByPageAndPub(PostPage page, boolean pub);
+    Long countListByPageAndPub(PostPage page, boolean pub);
 
     PostDetailDto findPostDetailByIdAndPub(Long id, boolean pub);
 

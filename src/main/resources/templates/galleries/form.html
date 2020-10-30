@@ -27,11 +27,11 @@
             <tr>
                 <td>
                     <div id="thumb-list">
-                        <div class="img-box mr-2" th:each="f, st : ${files}">
-                            <i class="far fa-window-close text-danger pointer" data-no="${f.no}"
+                        <div class="img-box mr-2" th:each="f, st : ${g?.files}">
+                            <i class="far fa-window-close text-danger pointer" th:data-no="${f.id}"
                                onclick="removeThumbnail(this)"></i>
                             <img class="border rounded-circle"
-                                 th:src="@{/files/thumb/gallery/${gId}/${filename}(w=150,h=150)}"
+                                 th:src="@{|/files/thumb/gallery/${g?.id}/${f.fileName}(w=150,h=150)}"
                                  alt="thumbnail" width="60" height="60">
                         </div>
                     </div>

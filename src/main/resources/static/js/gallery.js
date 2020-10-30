@@ -79,8 +79,9 @@ function removeThumbnail(icon) {
     const src = icon.nextElementSibling.src;
     //src를 /로 나눠 인덱스 고정 번호로 파일 이름을 얻어야 하는데 왠지 배열 길이가 고정일거 같지 않음..  그래서 뒤에서 2번째를 꺼내려고 함
     const split = src.split('/');
-    split.pop();                    //마지막 하나(size) 없애고
-    const fileName = split.pop();   //파일 이름
+    //split.pop();                    //마지막 하나(size) 없애고 -> 레거시랑 uri 다르게 하였음 /size가 없음
+    let fileName = split.pop();     //파일 이름  -> /size url가 없어서 파일명 뒤에 파라미터가 붙어버림 없애야함
+    fileName = fileName.substring(0, fileName.indexOf('?')); // 테스트 완료
 
     icon.parentElement.remove();   //썸네일 박스 제거
 
@@ -139,25 +140,23 @@ async function deleteGallery(id) {
     }
 }
 
-async function disableGallery(gno) {
+async function disableGallery(id) {
     if (!confirm('비공개 하시겠습니까?')) return;
 
-    const response = await fetch(`${gno}/edit/pub`, {
+    const response = await fetch(`/api/galleries/${id}/edit/pub`, {
         method: 'PUT',
-        //post는 되는데 put으로 보내면 서버에서 받지를 못한다;; json으로 하자..
-        //headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({pub: 0})
+        headers: {'Content-Type': 'text/plain'},
+        body: 'false'
     });
-    if (response.status === 200) {
-        const text = await response.text();
-        if (text === 'true')
-            location.href = `${getRoot()}/galleries`;
-        else
-            alert('다시 시도 해주세요.');
-    } else {
-        alert('disable, Error');
+    if (!response.ok) {
+        alert('Server Error');
+        return;
     }
+    const text = await response.text();
+    if (text === 'true')
+        location.href = `${getRoot()}/galleries`;
+    else
+        alert('다시 시도 해주세요.');
 }
 
 // 관리자 갤러리 리스트 체크박스 토글

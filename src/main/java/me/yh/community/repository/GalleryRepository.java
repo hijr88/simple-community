@@ -33,5 +33,10 @@ public interface GalleryRepository extends JpaRepository<Gallery, Long>, Gallery
     @Modifying
     @Query("delete from GalleryFile gf where gf.id in :ids")
     void deleteAllFileByIds(@Param("ids") List<Long> ids);
+
+    @Transactional
+    @Modifying
+    @Query("update Gallery g set g.pub= :pub where g.id= :id")
+    void changePubById(@Param("id") long id, @Param("pub") boolean pub);
 }
 

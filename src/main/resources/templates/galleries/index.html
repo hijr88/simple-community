@@ -7,7 +7,7 @@
 </head>
 <main class="mb-5 px-3 clearfix" id="gallery-index" layout:fragment="content">
     <nav class="px-3 mb-3">
-        <a href="galleries/new" class="btn btn-purple">이미지 올리기</a>
+        <a th:href="@{/galleries/new}" class="btn btn-purple">이미지 올리기</a>
     </nav>
 
     <section id="gallery-img" th:if="${page.content.size() != 0}">

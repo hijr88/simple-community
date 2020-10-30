@@ -50,6 +50,8 @@ public class HomeController {
                 Utils.redirectErrorPage(model, "글 수정을 실패하였습니다.","/posts");break;
             case "FAIL_ADD_GALLERY":
                 Utils.redirectErrorPage(model, "업로드를 실패하였습니다.", "/galleries");break;
+            case "FAIL_MODIFY_GALLERY":
+                Utils.redirectErrorPage(model, "글 수정을 실패하였습니다.","/galleries");break;
         }
         return "error/error-redirect";
     }

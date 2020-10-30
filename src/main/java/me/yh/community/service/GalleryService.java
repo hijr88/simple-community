@@ -11,4 +11,6 @@ public interface GalleryService {
     Gallery findGalleryDetail(long galleryId, boolean pub);
 
     boolean deleteGallery(long id);
+
+    boolean modifyGallery(Long id, String title, List<Long> deleteNo, List<String> deleteFileName, List<MultipartFile> newFiles);
 }

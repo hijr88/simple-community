@@ -51,7 +51,7 @@ public class PostApiController {
     /**
      * 게시판 상세보기에서 공개 비공개 처리
      * @param postId 게시글 번호
-     *
+     * @param bool true or false
      */
     @PutMapping(path = "/{postId}/edit/pub", consumes = "text/plain")
     public ResponseEntity<Boolean> postChangePub(@PathVariable long postId, @RequestBody String bool) {

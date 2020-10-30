@@ -37,16 +37,7 @@ public class GalleryServiceImpl implements GalleryService {
         }
 
         String folderPath = FileService.galleryPath + SE + saveGallery.getId();
-        for (MultipartFile mf : files) {
-            if (mf.getSize() == 0) continue;
-
-            String safeFileName = fileService.upload(folderPath, mf);
-            if (safeFileName == null) {
-                return false;
-            }
-            GalleryFile galleryFile = new GalleryFile(gallery, safeFileName, mf.getOriginalFilename(), mf.getSize());
-            gallery.addFiles(galleryFile);
-        }
+        if (createFiles(gallery, files, folderPath)) return false;
 
         return true;
     }
@@ -73,6 +64,31 @@ public class GalleryServiceImpl implements GalleryService {
 
     @Transactional
     @Override
+    public boolean modifyGallery(Long id, String title, List<Long> deleteNo, List<String> deleteFileName, List<MultipartFile> newFiles) {
+
+        Optional<Gallery> gallery_ = galleryRepository.findById(id);
+        if (gallery_.isEmpty()) {
+            return false;
+        }
+        Gallery gallery = gallery_.get();
+        gallery.setTitle(title);
+
+        String folderPath = FileService.galleryPath + SE +id;
+        if (deleteNo != null) {
+            galleryRepository.deleteAllFileByIds(deleteNo);
+            deleteFileName.forEach(s -> {
+                String filePath = folderPath + SE + s;
+                fileService.deleteFile(filePath);
+            });
+        }
+
+        if (createFiles(gallery, newFiles, folderPath)) return false;
+
+        return true;
+    }
+
+    @Transactional
+    @Override
     public boolean deleteGallery(long id) {
 
         final Optional<Gallery> gallery_ = galleryRepository.findById(id);
@@ -88,5 +104,19 @@ public class GalleryServiceImpl implements GalleryService {
         fileService.deleteFolder(folderPath);
 
         return true;
+    }
+
+    private boolean createFiles(Gallery gallery, List<MultipartFile> files, String folderPath) {
+        for (MultipartFile mf : files) {
+            if (mf.getSize() == 0) continue;
+
+            String safeFileName = fileService.upload(folderPath, mf);
+            if (safeFileName == null) {
+                return true;
+            }
+            GalleryFile galleryFile = new GalleryFile(gallery, safeFileName, mf.getOriginalFilename(), mf.getSize());
+            gallery.addFiles(galleryFile);
+        }
+        return false;
     }
 }

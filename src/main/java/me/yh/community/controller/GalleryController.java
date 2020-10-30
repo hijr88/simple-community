@@ -103,5 +103,59 @@ public class GalleryController {
         return "galleries/detail";
     }
 
+    /**
+     * @param id      갤러리 번호
+     * @param principal 유저
+     * @return 갤러리 수정 페이지
+     */
+    @GetMapping("{id}/edit")
+    public String editForm(Model model, RedirectAttributes ra,
+        @PathVariable long id, Principal principal) {
 
+        Optional<Gallery> gallery_ = galleryRepository.findById(id);
+        if (gallery_.isEmpty()) {
+            ra.addFlashAttribute("type","BAD_REQUEST");
+            return "redirect:/error-redirect";
+        }
+        Gallery gallery = gallery_.get();
+        if (!gallery.getMember().getId().equals(principal.getName())) { //작성자와 로그인한 아이디가 불일치 하는 경우
+            ra.addFlashAttribute("type","BAD_REQUEST");
+            return "redirect:/error-redirect";
+        }
+        gallery.getFiles().forEach(f -> {
+            f.setFileName(Utils.urlEncode(f.getFileName()));
+            f.setOriginalFileName(Utils.urlEncode(f.getOriginalFileName()));
+        });
+
+        model.addAttribute("title", "수정하기");
+        model.addAttribute("action", gallery.getId() + "/edit");
+        model.addAttribute("g",gallery);
+
+        return "galleries/form";
+    }
+
+    /**
+     * @param id            갤러리 번호
+     * @param title          제목
+     * @param deleteNo       삭제할 파일 번호
+     * @param deleteFileName 삭제할 파일 이름
+     * @param newFiles          추가 할 파일
+     * @return 성공시 번호에 해당하는 상세 페이지 실패시 리스트 페이지
+     */
+    @PostMapping(path = "/{id}/edit")
+    public String  modifyGallery(RedirectAttributes ra, @PathVariable long id
+            , @RequestParam("title") String title
+            , @RequestParam(value = "deleteNo", required = false) List<Long> deleteNo
+            , @RequestParam(value = "deleteFileName", required = false) List<String> deleteFileName
+            , @RequestParam(value = "file", required = false) List<MultipartFile> newFiles) {
+
+        boolean result = galleryService.modifyGallery(id, title, deleteNo, deleteFileName, newFiles);
+
+        if (result) {
+            return "redirect:/galleries/" + id;
+        } else {
+            ra.addFlashAttribute("type", "FAIL_MODIFY_GALLERY");
+            return "redirect:/error-redirect";
+        }
+    }
 }

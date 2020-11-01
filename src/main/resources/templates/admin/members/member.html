@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <title>관리자</title>
+</head>
+
+<main class="container mb-5" id="admin-member" layout:fragment="content">
+    <table class="table font-pretty-night" th:with="isMaster=${#authorization.expression('hasRole(''MASTER'')')}, isAdmin=${#authorization.expression('hasRole(''ADMIN'')')}">
+        <tr>
+            <td rowspan="4">
+                <div class="img">
+                    <img th:src="@{|/files/thumb/profile/${member.id}/${member.profileImage}(w=300,h=300)}" alt="프로필사진">
+                </div>
+            </td>
+            <td><span th:text="|아이디: ${member.id}|">아이디</span></td>
+        </tr>
+        <tr>
+            <td><span th:text="|닉네임: ${member.nickname}|">닉네임</span></td>
+        </tr>
+        <tr>
+            <td><span th:text="|이멤일: ${member.email}|">이메일</span></td>
+        </tr>
+        <tr>
+            <td><span th:text="|가입일: ${#temporals.format(member.createDate,'yyyy.MM.dd HH:mm:ss')}|">가입일</span></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <p th:if="${member.zoneCode == null}">주소: 없음</p>
+                <p th:unless="${member.zoneCode == null}" th:text="|주소: ${member.zoneCode}, ${member.address}, ${member.extraAddress}${member.detailAddress}|"></p>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <!--회원등급 변경은 마스터만 가능-->
+                <span>회원등급:&nbsp;</span>
+                <!--마스터 계정이 아니거나 조회한 회원등급이 마스터인경우-->
+                <span th:if="${!isMaster or member.role =='마스터'}" th:text="${member.role}"></span>
+
+                <!--마스터 계정이면서 조회한 회원등급이 마스터가 아닌경우-->
+                <th:block th:if="${isMaster and member.role != '마스터'}">
+                    <label>
+                        <input type="radio" name="role" value="ADMIN" th:checked="${member.role == '관리자'}"}>&nbsp;관리자
+                    </label>
+                    <label>
+                        <input type="radio" name="role" value="USER"  th:checked="${member.role == '사용자'}"}>&nbsp;사용자
+                    </label>
+                    <button class="btn btn-outline-info float-right" th:onclick="changeRole( [[${member.id}]] )">변경하기</button>
+                </th:block>
+            </td>
+        </tr>
+        <!--마스터 계정은 건들지 못하게 한다. 항상 활성화-->
+        <th:block th:if="${member.role != '마스터'}">
+            <tr th:if="${isMaster or not(isAdmin and member.role == '관리자') }"> <!--관리자 이지만 다른 관리자는 건들지 못하게 한다.-->
+                <td colspan="2">
+                    <span>회원상태:&nbsp;</span>
+                    <label>
+                        <input type="radio" name="enable" value="true" th:checked="${member.enable == true}"}>&nbsp;활동중
+                    </label>
+                    <label>&nbsp;
+                        <input type="radio" name="enable" value="false" th:checked="${member.enable == false}"}>&nbsp;활동중지
+                    </label>
+                    <button class="btn btn-outline-info float-right" th:onclick="changeEnable( [[${member.id}]] )">변경하기
+                    </button>
+                </td>
+            </tr>
+        </th:block>
+        <tr>
+            <td colspan="2">
+                <div class="text-center">
+                    <a th:href="@{|/admin/members${qs}}" class="btn btn-purple">돌아가기</a>
+                </div>
+            </td>
+        </tr>
+
+    </table>
+</main>
+<th:block layout:fragment="src">
+    <script th:src="@{/js/commons.js}"></script>
+    <script th:src="@{/js/admin.js}"></script>
+</th:block>
+</html>

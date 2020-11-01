@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <title>관리자</title>
+</head>
+
+<main class="container mb-5" id="admin-members" layout:fragment="content">
+    <!--검색창-->
+    <div class="text-right my-3 float-right">
+        <form action=""> <!-- 여기선 공백 검색 허용 -->
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <select class="form-control" name="f">
+                        <option value="id" th:selected="${page.field == 'id'}">아이디</option>
+                        <option value="name" th:selected="${page.field == 'name'}">닉네임</option>
+                    </select>
+                </div>
+                <input type="text" class="form-control" name="q" id="q" th:value="${page.query}">
+                <div class="input-group-append">
+                    <button type="submit" class="form-control btn-purple"><i class="fa fa-search"></i></button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <table class="table font-pretty-night">
+        <thead>
+        <tr>
+            <th>아이디</th>
+            <th>닉네임</th>
+            <th>가입일</th>
+            <th>회원등급</th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr th:each="m : ${page.content}">
+                <td><a th:href="@{|/admin/members/${m.id}}" th:text="${m.id}">아이디</a></td>
+                <td><span th:text="${m.nickname}">닉네임</span></td>
+                <td class="text-center"><span th:text="${#temporals.format(m.createDate,'yyyy.MM.dd')}">가입일</span></td>
+                <td class="text-center"><span th:text="${m.role}">회원 등급</span></td>
+            </tr>
+
+            <tr class="text-center" th:if="${page.totalCount == 0}">
+                <td colspan="4">검색된 결과가 없습니다.</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="clearfix">
+        <h5 class="float-right">
+            <span class="current-page-num" th:text="${page.current}"></span>/
+            <span class="font-weight-normal" th:text="${page.pageMaxNum}"></span>
+        </h5>
+    </div>
+    <section class="container my-2 text-center clearfix">
+        <nav class="pager">
+            <ul class="pagination">
+                <th:block th:if="${page.current != 1}">
+                    <li class="page-item">
+                        <a class="page-link" th:href="@{/admin/members(f=${page.field},q=${page.query},p=1)}">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" th:href="@{/admin/members(f=${page.field},q=${page.query},p=${page.current -1})}">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    </li>
+                </th:block>
+
+                <th:block th:each="i, st: ${#numbers.sequence(page.current -2 , page.current +2)}">
+                    <li class="page-item" th:if="${st.count > 0 && st.count <= page.pageMaxNum}" th:classappend="${st.count == page.current} ? 'active' ">
+                        <a class="page-link" th:href= "@{(${st.count == page.current} ? 'javascript:;' : |?f=${page.field}&q=${page.query}&p=${st.count}| )}" th:text="${st.count}"></a>
+                    </li>
+                </th:block>
+
+                <th:block th:if="${page.current < page.pageMaxNum}">
+                    <li class="page-item">
+                        <a class="page-link" th:href="@{|/admin/members(f=${page.field},q=${page.query},p=${page.current +1})}">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" th:href="@{|/admin/members(f=${page.field},q=${page.query},p=${page.pageMaxNum})}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                </th:block>
+            </ul>
+        </nav>
+    </section>
+</main>
+</html>

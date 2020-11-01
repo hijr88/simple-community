@@ -1,9 +1,9 @@
 package me.yh.community.config;
 
 import me.yh.community.config.support.GalleryPageHandlerMethodArgumentResolver;
+import me.yh.community.config.support.MemberPageHandlerMethodArgumentResolver;
 import me.yh.community.config.support.PostPageHandlerMethodArgumentResolver;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
@@ -19,6 +19,8 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Autowired
     GalleryPageHandlerMethodArgumentResolver galleryPageHandlerMethodArgumentResolver;
+    @Autowired
+    MemberPageHandlerMethodArgumentResolver memberPageHandlerMethodArgumentResolver;
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
@@ -29,6 +31,6 @@ public class WebConfig implements WebMvcConfigurer {
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(postPageHandlerMethodArgumentResolver);
         resolvers.add(galleryPageHandlerMethodArgumentResolver);
+        resolvers.add(memberPageHandlerMethodArgumentResolver);
     }
-
 }

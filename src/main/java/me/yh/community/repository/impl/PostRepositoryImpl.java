@@ -108,9 +108,9 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         if (page.getQuery().equals(""))
             return null;
         if (page.getField().equals("title")) {
-            return post.title.contains(page.getQuery());
+            return post.title.containsIgnoreCase(page.getQuery());
         } else if (page.getField().equals("writer")) {
-            return member.nickname.contains(page.getQuery());
+            return member.nickname.containsIgnoreCase(page.getQuery());
         }
         return null;
     }

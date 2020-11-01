@@ -1,13 +1,17 @@
 package me.yh.community.repository;
 
+import me.yh.community.dto.member.MemberListDto;
+import me.yh.community.dto.member.MemberPage;
 import me.yh.community.entity.Member;
+import me.yh.community.repository.custom.MemberRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
-public interface MemberRepository extends JpaRepository<Member, Long> {
+public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
     //아이디 중복 검사
     int countById(String id);
     //이메일 중복 검사

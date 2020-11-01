@@ -65,7 +65,7 @@ public class HomeController {
         response.setCharacterEncoding("utf-8");
         PrintWriter out = response.getWriter();
         String msg = "<script>" +
-                "        alert('다른 사용자가 접속하여 로그인이 해제되었습니다.');" +
+                "        alert('로그인이 해제되었습니다.');" +
                 "        location.href= ' " + root + "/index';" +
                 "    </script>";
         out.write(msg);

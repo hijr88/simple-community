@@ -5,7 +5,7 @@ import lombok.*;
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 
-@Getter
+@Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString

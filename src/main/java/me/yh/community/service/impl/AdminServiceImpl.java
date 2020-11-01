@@ -3,17 +3,20 @@ package me.yh.community.service.impl;
 import lombok.RequiredArgsConstructor;
 import me.yh.community.config.security.CustomUser;
 import me.yh.community.entity.Member;
+import me.yh.community.repository.GalleryRepository;
 import me.yh.community.repository.MemberRepository;
+import me.yh.community.repository.PostRepository;
 import me.yh.community.service.AdminService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 
@@ -22,7 +25,10 @@ import java.util.Optional;
 public class AdminServiceImpl implements AdminService {
 
     private final MemberRepository memberRepository;
+    private final PostRepository postRepository;
+    private final GalleryRepository galleryRepository;
     private final SessionRegistry sessionRegistry;
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Transactional
     @Override
@@ -66,5 +72,45 @@ public class AdminServiceImpl implements AdminService {
                 }
             }
         });
+    }
+
+    @Transactional
+    @Override
+    public void modifyPostAllPub(String allNo_, String openNo_) {
+        List<Long> closeNo = Arrays.stream(allNo_.split(" ")).map(Long::parseLong).collect(Collectors.toList());
+        List<Long> openNo = Arrays.stream(openNo_.split(" ")).map(Long::parseLong).collect(Collectors.toList());
+
+        closeNo.removeAll(openNo);
+
+        log.info("오픈{}", openNo.toString());
+        if (openNo.size() != 0) {
+            postRepository.openPub(openNo);
+        }
+
+        log.info("닫기{}", closeNo.toString());
+        if (closeNo.size() != 0) {
+            postRepository.closePub(closeNo);
+        }
+    }
+
+    @Transactional
+    @Override
+    public void modifyGalleryAllPub(String allNo_, String openNo_) {
+
+        List<Long> closeNo = Arrays.stream(allNo_.split(" ")).map(Long::parseLong).collect(Collectors.toList());
+        List<Long> openNo = Arrays.stream(openNo_.split(" ")).map(Long::parseLong).collect(Collectors.toList());
+
+        closeNo.removeAll(openNo);
+
+        log.info("오픈{}", openNo.toString());
+        if (openNo.size() != 0) {
+            galleryRepository.openPub(openNo);
+        }
+
+        log.info("닫기{}", closeNo.toString());
+        if (closeNo.size() != 0) {
+            galleryRepository.closePub(closeNo);
+        }
+
     }
 }

@@ -43,14 +43,22 @@ public class GalleryServiceImpl implements GalleryService {
     }
 
     @Override
-    public Gallery findGalleryDetail(long galleryId, boolean b) {
+    public Gallery findGalleryDetail(long galleryId, Boolean pub) {
 
-        boolean exists = galleryRepository.existsGalleryDetailByIdAndPub(galleryId, true);
+        boolean exists;
+        Optional<Gallery> gallery_;
+
+        if (pub != null) {
+            exists = galleryRepository.existsGalleryDetailByIdAndPub(galleryId, pub);
+            gallery_ = galleryRepository.findGalleryDetailByIdAndPub(galleryId, pub);
+        } else {
+            exists = galleryRepository.existsById(galleryId);
+            gallery_ = galleryRepository.findGalleryDetailById(galleryId);
+        }
         if (!exists) { //글이 존재 하지 않으면 에러 처리
            return null;
         }
 
-        Optional<Gallery> gallery_ = galleryRepository.findGalleryDetailByIdAndPub(galleryId, true);
         if (gallery_.isEmpty()) {
             return null;
         }

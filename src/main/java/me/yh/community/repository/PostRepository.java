@@ -8,9 +8,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 public interface PostRepository extends JpaRepository<Post, Long>, PostRepositoryCustom {
 
-    boolean existsByIdAndPub(Long id, boolean pub);
+    boolean existsByIdAndPub(Long id, Boolean pub);
 
     @Query("select max(p.groupOrder) from Post p where p.parent = :id")
     Integer findLastChildOrderById(@Param("id") Long id);
@@ -34,4 +36,12 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
     @Modifying
     @Query("update Post p set p.pub = :pub where p.id = :id")
     void changePubById(@Param("id") long id, @Param("pub") boolean pub);
+
+    @Modifying
+    @Query("update Post p set p.pub = true where p.id in :ids")
+    void openPub(@Param("ids") List<Long> openNo);
+
+    @Modifying
+    @Query("update Post p set p.pub = false where p.id in :ids")
+    void closePub(@Param("ids") List<Long> closeNo);
 }

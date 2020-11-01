@@ -11,4 +11,5 @@ public class GalleryListDto {
     private Long id;
     private String fileName;
     private int childCount;
+    private Boolean pub;
 }

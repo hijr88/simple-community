@@ -178,21 +178,23 @@ async function updateGalleriesPub() {
     const openNo = openNoArray.join(" ");
     console.log(`'${openNo}'`);
 
-    const response = await fetch('', {
+    const response = await fetch('/admin/galleries/edit/all-pub', {
         method: 'PUT',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({"allNo": allNo, "openNo": openNo})
     })
-    if (response.status === 200) {
-        const text = await response.text();
-        if (text === 'true') {
-            showAlert('success', '변경 되었습니다.', true);
-        } else {
-            showAlert('danger', '다시 시도해주세요.', true);
-        }
-    } else {
-        alert('Error')
+    if (!response.ok) {
+        alert('Server Error');
+        return;
     }
+
+    const text = await response.text();
+    if (text === 'true') {
+        showAlert('success', '변경 되었습니다.', true);
+    } else {
+        showAlert('danger', '다시 시도해주세요.', true);
+    }
+
 }
 
 function checkedGalleriesPub() {

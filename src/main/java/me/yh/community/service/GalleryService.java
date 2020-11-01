@@ -8,7 +8,7 @@ import java.util.List;
 public interface GalleryService {
     boolean createNewGallery(Gallery gallery, List<MultipartFile> files);
 
-    Gallery findGalleryDetail(long galleryId, boolean pub);
+    Gallery findGalleryDetail(long galleryId, Boolean pub);
 
     boolean deleteGallery(long id);
 

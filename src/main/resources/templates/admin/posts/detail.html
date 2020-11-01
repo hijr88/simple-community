@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <title th:text="${p.title}">글 제목</title>
+</head>
+
+<main layout:fragment="content" id="boardDetail">
+    <input type="hidden" id="user-name" th:value="${#authentication.name}">
+    <input type="hidden" id="admin" th:value="${#authorization.expression('hasRole(''ADMIN'')')} ? 'true' : 'false' ">
+    <input type="hidden" id="post-id" th:value="${p.postId}">
+
+    <section class="container">
+        <table class="table ">
+            <tr class="row">
+                <td class="col-md-12 clearfix">
+                    <div class="d-inline-block pt-2 mr-2">
+                        <img th:src="@{|/files/thumb/profile/${p.memberId}/${p.profileImage}(w=30,h=30)}" width="30" height="30"
+                        class="border rounded-circle" alt="프로필 이미지">
+                    </div>
+                    <div class="d-inline-block align-middle" style="word-break: break-all">
+                        <span class="board-info" th:text="|작성자 ${p.nickname}(${p.memberId})|">작성자 </span>
+                        <span class="board-info ml-2" th:text="|추천 ${p.recommend}|">추천수 </span>
+                        <span class="board-info ml-2" th:text="|조회 ${p.hit}|">조회수 </span>
+                        <span class="ml-2" th:text="${#temporals.format(p.createDate, 'yy.MM.dd HH:mm')}"><</span>
+                    </div>
+                    <a th:href="@{|/admin/posts/${qs}}" class="btn btn-outline-danger float-right mt-1">목록</a>
+                </td>
+            </tr>
+            <tr class="row">
+                <th class="col-md-2">제목</th>
+                <td class="col-md-10"><input type="text" class="form-control" readonly th:value="${p.title}"/>
+                </td>
+            </tr>
+            <tr class="row" th:if="${not #strings.isEmpty(p.fileName)}">
+                <th class="col-md-2">첨부파일</th>
+                <td class="col-md-10 clearfix">
+                    <div class="form-control text-center">
+                        <a th:href="@{|/files/down/posts/${p.postId}/${p.fileName}(o=${p.originalFileName})}" class="text-info">
+                            <h5 class="d-inline" style="word-break: break-all" th:text="${#strings.length(p.originalFileName)} > 36 ? ${#strings.substring(p.originalFileName,0,36)} : ${p.originalFileName}"></h5>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            <tr class="row">
+                <th class="col-md-2">내용</th>
+                <td class="col-md-10">
+                    <textarea rows="14" name="content" class="form-control" readonly style="white-space: pre" th:text="${p.content}">내용</textarea>
+                </td>
+            </tr>
+            <!-- 관리자 이상 또는 작성자만 보이게하기 -->
+            <tr th:if="${#authorization.expression('hasRole(''ADMIN'')') || #authentication.name == p.memberId}">
+                <td colspan="2" class="py-3 d-flex justify-content-around">
+                    <!--관리자 이상만 비공개 처리 가능-->
+                    <input type="button" th:value="${p.pub} ? '비공개하기' : '공개하기'" class="btn btn-purple" th:onclick="|toggleBoardPub(${p.postId},this)|" sec:authorize-expr="hasRole('ADMIN')">
+                    <!--본인이 쓴 글만 수정 가능-->
+                    <a th:href="@{|/posts/${p.postId}/edit|}" class="btn btn-purple" th:if="${#authentication.name == p.memberId and p.pub}">수정하기</a>
+                    <input type="button" value="삭제하기" class="btn btn-purple" th:onclick="|deletePost(${p.postId});|">
+                </td>
+            </tr>
+        </table>
+    </section>
+    <div class="container my-3 clearfix action">
+        <button class="btn btn-outline-dark" onclick="toggleViewComment();">
+            <span>댓글</span><span class="text-danger ml-1" id="total-comment-count">댓글수</span>
+        </button>
+        <button class="btn btn-outline-dark" onclick="upRecommend();">추천하기
+            <span class="text-danger ml-1" id="recommend-count" th:text="${p.recommend}">추천수</span>
+        </button>
+        <a th:href="@{|${p.postId}/reply|}" class="btn btn-outline-danger float-right">답글</a>
+    </div>
+
+    <section class="container my-3 p-2 bg-light-gray" id="comment-view">
+
+        <div class="bg-white mb-2 comment-write-box">
+            <textarea class="form-control no-resize" rows="1" placeholder="댓글입력" maxlength="200"
+                      onfocus="focusTextArea(this);" onkeyup="checkMaxLength(this);"></textarea>
+            <div class="p-2 clearfix hide">
+                <span class="currentLength">0</span><span class="maxLength text-muted">/200</span>
+                <button type="button" class="float-right btn btn-outline-success btn-sm" data-cno="0"
+                        onclick="addComment(this);">댓글등록
+                </button>
+                <button type="button" class="float-right btn btn-outline-danger btn-sm mr-3"
+                        onclick="cancelComment(this);">취소
+                </button>
+            </div>
+        </div>
+
+        <!-- 댓글리스트 -->
+        <ul id="comment-list" class="list-group">
+            <!--/*-->
+            <li class="list-group-item p-2" >
+                <div class="comment-info">
+                    <span class="comment-writer text-muted">작성자입니다12</span>
+                    <span class="mx-2" style="color: #e2d7df;">|</span>
+                    <span class="comment-regdate text-muted">20.10.20 19:20:58</span>
+                    <!-- 작성자 or 관리자 -->
+                    <span class="float-right comment-option">
+                            <div class="dropdown">
+                            <!--Trigger-->
+                            <a  type="button" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v text-muted"></i></a>
+                                <!--Menu-->
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <a class="dropdown-item" href="#">삭제</a>
+                                <a class="dropdown-item" href="#">????</a>
+                            </div>
+                            </div>
+                        </span>
+                </div>
+                <hr class="my-1">
+                <p class="comment-content my-1">댓글댓글댓글댓글댓글댓글댓글댓글댓글댓글
+                </p>
+                <a class="small text-dark" href="javascript:;" onclick="replyComment(this);">
+                    <span class="reply-txt mr-1">답글</span><span class="reply-cnt font-weight-bold">0</span>
+                    <input type="radio" name="reply">
+                </a>
+                <!--답글들어갈목록-->
+            </li>
+
+            <!-- 이거 복사 -->
+            <li class="list-group-item p-2">
+                <div class="comment-info">
+                    <img th:src="@{|/files/thumb/profile/${p.memberId}/${p.profileImage}(w=30,h=30)}"
+
+                    alt="프로필이미지" class="rounded-circle" width="30" height="30">
+                    <span class="comment-writer text-muted">작성자입니다12</span>
+                    <span class="mx-2" style="color: #e2d7df;">|</span>
+                    <span class="comment-regdate text-muted">20.10.20 19:20:58</span>
+
+                    <!-- 작성자 or 관리자 -->
+                    <span class="float-right comment-option">
+                        <div class="dropdown">
+                        <!--Trigger-->
+                        <a  type="button" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></a>
+                            <!--Menu-->
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a class="dropdown-item" href="#">삭제</a>
+                            <a class="dropdown-item" href="#">????</a>
+                        </div>
+                        </div>
+                    </span>
+                </div>
+                <hr class="my-1">
+                <p class="comment-content my-1">댓글댓글댓글댓글댓글댓글댓글댓글</p>
+                <a class="small text-dark" href="javascript:;" data-ano="${b.articleNo}" data-cno="123" onclick="replyComment(this);">
+                    <span class="reply-txt mr-1">답글</span><span class="reply-cnt font-weight-bold">0</span>
+                    <input type="radio" name="reply">
+                </a>
+            </li>
+            <!--*/-->
+        </ul>
+    </section>
+</main>
+<th:block layout:fragment="src">
+<script th:src="@{/js/commons.js}"></script>
+<script th:src="@{/js/post/post.js}"></script>
+<script th:src="@{/js/post/postDetail.js}"></script>
+<script th:src="@{/js/admin.js}"></script>
+</th:block>
+</html>

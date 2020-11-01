@@ -18,9 +18,10 @@ public class PostListDto {
     private Long hit;
     private int dept;
     private Long comment;
+    private boolean pub;
 
     @QueryProjection
-    public PostListDto(Long id, String title, String writer, LocalDateTime createDate, Long recommend, Long hit, int dept, Long comment) {
+    public PostListDto(Long id, String title, String writer, LocalDateTime createDate, Long recommend, Long hit, int dept, Long comment, boolean pub) {
         this.id = id;
         this.title = title;
         this.writer = writer;
@@ -29,5 +30,6 @@ public class PostListDto {
         this.hit = hit;
         this.dept = dept;
         this.comment = comment;
+        this.pub = pub;
     }
 }

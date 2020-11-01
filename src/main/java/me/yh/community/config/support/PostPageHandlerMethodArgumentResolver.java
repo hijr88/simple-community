@@ -81,8 +81,8 @@ public class PostPageHandlerMethodArgumentResolver implements HandlerMethodArgum
         PostPage postPage = new PostPage(field,query,page);
 
         if (requestURI.contains("/admin")) {
-            list = postRepository.findListByPageAndPub(postPage, false);
-            totalCount = postRepository.countListByPageAndPub(postPage, false);
+            list = postRepository.findListByPageAndPub(postPage, null);
+            totalCount = postRepository.countListByPageAndPub(postPage, null);
         } else {
             list = postRepository.findListByPageAndPub(postPage, true);
             totalCount = postRepository.countListByPageAndPub(postPage, true);

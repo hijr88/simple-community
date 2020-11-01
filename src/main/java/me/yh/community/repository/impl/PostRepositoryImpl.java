@@ -26,7 +26,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<PostListDto> findListByPageAndPub(PostPage page, boolean pub) {
+    public List<PostListDto> findListByPageAndPub(PostPage page, Boolean pub) {
 
         long offset = (page.getCurrent() -1) * 10;
 
@@ -34,13 +34,13 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         QComment comment = QComment.comment;
 
         return queryFactory
-                .select(new QPostListDto(post.id, post.title, post.member.nickname, post.createDate, recommend.countDistinct(), post.hit, post.dept, comment.countDistinct() ) )
+                .select(new QPostListDto(post.id, post.title, post.member.nickname, post.createDate, recommend.countDistinct(), post.hit, post.dept, comment.countDistinct(), post.pub ) )
                 .from(post)
                 .join(post.member, member)
                 .leftJoin(recommend).on(post.id.eq(recommend.postId))
                 .leftJoin(comment).on(post.id.eq(comment.postId))
                 .where(
-                        post.pub.eq(pub),
+                        pubEq(pub),
                         post.delete.eq(false),
                         fieldEq(page)
                 )
@@ -51,12 +51,12 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public Long countListByPageAndPub(PostPage page, boolean pub) {
+    public Long countListByPageAndPub(PostPage page, Boolean pub) {
         return queryFactory
                 .from(post)
                 .join(post.member, member)
                 .where(
-                        post.pub.eq(pub),
+                        pubEq(pub),
                         post.delete.eq(false),
                         fieldEq(page)
                 )
@@ -64,18 +64,18 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public PostDetailDto findPostDetailByIdAndPub(Long id, boolean pub) {
+    public PostDetailDto findPostDetailByIdAndPub(Long id, Boolean pub) {
 
         QPostRecommend recommend = postRecommend;
         QPostFile file = postFile;
 
         PostDetailDto postDetail = queryFactory
-                .select(new QPostDetailDto(post.id, post.title, post.content, member.id, member.nickname, member.profileImage, post.createDate, post.hit, recommend.countDistinct(), file.fileName, file.originalFileName))
+                .select(new QPostDetailDto(post.id, post.title, post.content, member.id, member.nickname, member.profileImage, post.createDate, post.hit, recommend.countDistinct(), file.fileName, file.originalFileName, post.pub))
                 .from(post)
                 .join(post.member, member)
                 .leftJoin(post.files, file)
                 .leftJoin(recommend).on(post.id.eq(recommend.postId))
-                .where(post.id.eq(id).and(post.pub.eq(pub)).and(post.delete.eq(false)))
+                .where(post.id.eq(id).and(pubEq(pub)).and(post.delete.eq(false)))
                 .groupBy(post.id, post.title, post.content, member.id, member.nickname, member.profileImage, post.createDate, post.hit, file.fileName, file.originalFileName)
                 .fetchOne();
 
@@ -113,5 +113,12 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
             return member.nickname.containsIgnoreCase(page.getQuery());
         }
         return null;
+    }
+
+    private BooleanExpression pubEq(Boolean pubCond) {
+        if (pubCond == null) {
+            return null;
+        }
+        return post.pub.eq(pubCond);
     }
 }

@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface GalleryRepositoryCustom {
 
-    List<GalleryListDto> findListByPageAndPub(long page, boolean pub);
+    List<GalleryListDto> findListByPageAndPub(long page, Boolean pub);
 
-
+    List<GalleryListDto> findListByPage(long page);
 }

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <title th:text="${g.title}">글 제목</title>
+</head>
+<main class="container" id="gallery-detail" layout:fragment="content">
+    <table class="table">
+        <tr>
+            <td>
+                <h4 class="d-inline" th:text="${g.title}">글 제목</h4>
+                <a th:href="@{|/admin/galleries/${qs}}" class="btn btn-outline-danger float-right mt-1">목록</a>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <div>
+                    <div class="text-center mb-3" th:each="f : ${g.files}">
+                        <a target="_blank"
+                           th:href="@{|/files/original/gallery/${g.id}/${f.fileName}(o=${f.originalFileName})}"
+                           style="text-decoration: none">
+                            <img th:src="@{|/files/original/gallery/${g.id}/${f.fileName}}" alt="picture" style="max-width: 100%">
+                        </a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <!-- 관리자 이상 또는 작성자만 보이게하기 -->
+    <section class="container d-flex justify-content-around mb-3" th:if="${#authorization.expression('hasRole(''ADMIN'')') || #authentication.name == g.member.id}">
+        <!--관리자 이상만 비공개 처리 가능-->
+        <input type="button" th:value="${g.pub} ? '비공개하기' : '공개하기'" class="btn btn-outline-purple" sec:authorize-expr="hasRole('ADMIN')" th:onclick="|toggleGalleryPub(${g.id},this);|">
+        <!--본인이 쓴 글만 수정 가능-->
+        <a th:href="@{|${g.id}/edit|}" class="btn btn-outline-success" th:if="${#authentication.name == g.member.id}">수정하기</a>
+        <input type="button" value="삭제하기" class="btn btn-outline-danger" th:onclick="|deleteGallery(${g.id});|">
+    </section>
+</main>
+<th:block layout:fragment="src">
+    <script th:src="@{/js/commons.js}"></script>
+    <script th:src="@{/js/gallery.js}"></script>
+    <script th:src="@{/js/admin.js}"></script>
+</th:block>
+</html>

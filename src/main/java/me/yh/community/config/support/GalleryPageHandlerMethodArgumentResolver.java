@@ -58,8 +58,8 @@ public class GalleryPageHandlerMethodArgumentResolver implements HandlerMethodAr
         log.info("접속한 URI : " + requestURI);
 
         if (requestURI.contains("/admin")) {
-            list = galleryRepository.findListByPageAndPub(page, false);
-            totalCount = galleryRepository.countListByPub(false);
+            list = galleryRepository.findListByPage(page);
+            totalCount = galleryRepository.count();
         } else {
             list = galleryRepository.findListByPageAndPub(page, true);
             totalCount = galleryRepository.countListByPub(true);

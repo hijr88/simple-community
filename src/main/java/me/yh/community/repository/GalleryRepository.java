@@ -21,6 +21,9 @@ public interface GalleryRepository extends JpaRepository<Gallery, Long>, Gallery
 
     boolean existsGalleryDetailByIdAndPub(long galleryId, boolean b);
 
+    @Query("select g from Gallery g join fetch g.files where g.id = :id")
+    Optional<Gallery> findGalleryDetailById(@Param("id") long galleryId);
+
     @Query("select g from Gallery g join fetch g.files where g.id = :id and g.pub = :pub")
     Optional<Gallery> findGalleryDetailByIdAndPub(@Param("id") long galleryId,@Param("pub") boolean pub);
 
@@ -38,5 +41,13 @@ public interface GalleryRepository extends JpaRepository<Gallery, Long>, Gallery
     @Modifying
     @Query("update Gallery g set g.pub= :pub where g.id= :id")
     void changePubById(@Param("id") long id, @Param("pub") boolean pub);
+
+    @Modifying
+    @Query("update Gallery g set g.pub = true where g.id in :ids")
+    void openPub(@Param("ids") List<Long> openNo);
+
+    @Modifying
+    @Query("update Gallery g set g.pub = false where g.id in :ids")
+    void closePub(@Param("ids") List<Long> closeNo);
 }
 

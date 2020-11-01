@@ -2,7 +2,6 @@ package me.yh.community.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import me.yh.community.dto.post.PostDetailDto;
-import me.yh.community.dto.post.PostPage;
 import me.yh.community.dto.post.PostRequestDto;
 import me.yh.community.entity.Member;
 import me.yh.community.entity.Post;
@@ -30,20 +29,6 @@ public class PostServiceImpl implements PostService {
     private final FileService fileService;
     private final PostRecommendRepository postRecommendRepository;
     private final String SE = FileService.SE;
-
-    @Override
-    public PostPage findPostList(PostPage page) {
-        page.setContent(postRepository.findListByPageAndPub(page,true));
-
-        Long totalCount = postRepository.countListByPageAndPub(page, true);
-        page.setTotalCount(totalCount);
-
-        long pageMaxNum =  (long) Math.ceil( (totalCount /10.0) );
-        pageMaxNum = pageMaxNum == 0 ? 1 : pageMaxNum;
-        page.setPageMaxNum(pageMaxNum);
-
-        return page;
-    }
 
     @Transactional
     @Override
@@ -87,10 +72,10 @@ public class PostServiceImpl implements PostService {
 
     @Transactional
     @Override
-    public PostDetailDto findPostDetailByIdAndPub(long id, boolean pub) {
+    public PostDetailDto findPostDetailByIdAndPub(long id, Boolean pub) {
         postRepository.incrementHitById(id);
 
-        return postRepository.findPostDetailByIdAndPub(id, true);
+        return postRepository.findPostDetailByIdAndPub(id, pub);
     }
 
     @Transactional

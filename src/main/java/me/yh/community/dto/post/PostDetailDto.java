@@ -21,9 +21,10 @@ public class PostDetailDto {
     private Long recommend;
     private String fileName;
     private String originalFileName;
+    private Boolean pub;
 
     @QueryProjection
-    public PostDetailDto(Long postId, String title, String content, String memberId, String nickname, String profileImage, LocalDateTime createDate, Long hit, Long recommend, String fileName, String originalFileName) {
+    public PostDetailDto(Long postId, String title, String content, String memberId, String nickname, String profileImage, LocalDateTime createDate, Long hit, Long recommend, String fileName, String originalFileName, Boolean pub) {
         this.postId = postId;
         this.title = title;
         this.content = content;
@@ -35,5 +36,6 @@ public class PostDetailDto {
         this.recommend = recommend;
         this.fileName = fileName;
         this.originalFileName = originalFileName;
+        this.pub = pub;
     }
 }

@@ -41,9 +41,7 @@ public class PostController {
     @GetMapping(path = {"","/"})
     public String index(Model model, PostPage page){
 
-        PostPage result = postService.findPostList(page);
-
-        List<PostListDto> list = result.getContent();
+        List<PostListDto> list = page.getContent();
         List<Boolean> isNow = isNow(list);
 
         model.addAttribute("isNow",isNow);

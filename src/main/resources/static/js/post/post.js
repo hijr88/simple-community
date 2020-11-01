@@ -83,7 +83,7 @@ function deleteFile() {
 
 
 //관리자 게시판 일괄 공개 버튼
-async function updateBoardsPub() {
+async function updatePostsPub() {
     const allNo = document.querySelector('input[name=allNo]').value.trim();
     console.log(`'${allNo}'`);
 
@@ -96,20 +96,21 @@ async function updateBoardsPub() {
     const openNo = openNoArray.join(" ");
     console.log(`'${openNo}'`);
 
-    const response = await fetch('boards/edit/AllPub', {
+    const response = await fetch('/admin/posts/edit/all-pub', {
         method: 'PUT',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({"allNo": allNo, "openNo": openNo})
     })
-    if (response.status === 200) {
-        const text = await response.text();
-        if (text === 'true') {
-            showAlert('success', '변경 되었습니다.', true);
-        } else {
-            showAlert('danger', '다시 시도해주세요.', true);
-        }
+    if (!response.ok) {
+        alert('Server Error');
+        return;
+    }
+
+    const text = await response.text();
+    if (text === 'true') {
+        showAlert('success', '변경 되었습니다.', true);
     } else {
-        alert('Error')
+        showAlert('danger', '다시 시도해주세요.', true);
     }
 }
 

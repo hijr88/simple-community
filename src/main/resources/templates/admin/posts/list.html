@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <title>관리자 게시판</title>
+</head>
+
+<main layout:fragment="content" id="board-list">
+    <section class="container">
+        <div>
+            <h1>관리자 게시판</h1>
+        </div>
+
+        <!--검색창-->
+        <article class="text-right my-3 float-right">
+            <form action="" onsubmit="return notAllowEmpty(this);">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <select class="form-control" name="f">
+                            <option value="title" th:selected="${page.field == 'title'}">제목</option>
+                            <option value="writer" th:selected="${page.field == 'writer'}">작성자</option>
+                        </select>
+                    </div>
+                    <input type="text" class="form-control" name="q" id="q" th:value="${page.query}">
+                    <div class="input-group-append">
+                        <button type="submit" class="form-control btn-purple"><i class="fa fa-search"></i></button>
+                    </div>
+                </div>
+            </form>
+        </article>
+
+        <!--게시글목록-->
+        <article class="table-responsive">
+            <table class="table tbl-board">
+                <thead>
+                <tr class="text-center">
+                    <th>번호</th>
+                    <th>제목</th>
+                    <th>작성자</th>
+                    <th>작성일</th>
+                    <th>추천</th>
+                    <th>조회</th>
+                    <th>공개</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr class="text-center" th:each="p, st: ${page.content}">
+                        <td>
+                            <span th:text="${p.id}">글 번호</span>
+                        </td>
+                        <td class="text-left tbl-title">
+                            <a th:href="@{|/admin/posts/${p.id}}" th:style="|margin-left: ${p.dept * 14}px;|">
+                                <span class="icon-reply" th:if="${p.dept != 0}"></span><span th:text="${p.title}"></span>
+                            </a>
+                            <span class="reply-count" th:if="${p.comment != 0}" th:text="${p.comment}">댓글 개수</span>
+                        </td>
+                        <td>
+                            <span th:text="${p.writer}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${isNow[st.index]} ? ${#temporals.format(p.createDate, 'HH:mm')} : ${#temporals.format(p.createDate, 'yy.MM.dd')}"></span>
+                        </td>
+                        <td><span th:text="${p.recommend}">추천수</span></td>
+                        <td><span th:text="${p.hit}">조회수</span></td>
+                        <td><input type="checkbox" name="no" th:value="${p.id}" th:checked="${p.pub}"></td>
+                    </tr>
+                    <input type="hidden" name="allNo" th:value="${allNo}">
+
+                    <tr class="text-center" th:if="${page.content.size() == 0}">
+                        <td colspan="6">검색된 결과가 없습니다.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <article class="mb-3 text-right" th:if="${page.totalCount != 0}">
+                <button class="btn btn-outline-purple" onclick="checkedBoardsPub();">전체 선택</button>
+                <button class="btn btn-outline-danger mr-5" onclick="unCheckedBoardsPub();">전체 해제</button>
+                <input type="button" class="btn btn-outline-dark" value="일괄공개" onclick="updatePostsPub()">
+            </article>
+        </article>
+        <div class="clearfix">
+            <h5 class="float-right">
+                <span class="current-page-num" th:text="${page.current}">현재 페이지 번호</span>/<span class="font-weight-normal" th:text="${page.pageMaxNum}">마지막 페이지 번호</span>
+            </h5>
+        </div>
+    </section>
+
+    <section class="container my-2 text-center clearfix">
+        <nav class="pager">
+            <ul class="pagination">
+                <th:block th:if="${page.current != 1}">
+                    <li class="page-item">
+                        <a class="page-link" th:href="@{/admin/posts(f=${page.field},q=${page.query},p=1)}">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" th:href="@{/admin/posts(f=${page.field},q=${page.query}, p=${page.current -1})}">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    </li>
+                </th:block>
+                <th:block th:each="i, st: ${#numbers.sequence(page.current -2 , page.current +2)}">
+                    <li class="page-item" th:if="${st.count > 0 && st.count <= page.pageMaxNum}" th:classappend="${st.count == page.current} ? 'active' ">
+                        <a class="page-link" th:href= "@{(${st.count == page.current} ? 'javascript:;' : |?f=${page.field}&q=${page.query}&p=${st.count}| )}" th:text="${st.count}"></a>
+                    </li>
+                </th:block>
+                <th:block th:if="${page.current < page.pageMaxNum}">
+                    <li class="page-item">
+                        <a class="page-link" th:href="@{/admin/posts(f=${page.field},q=${page.query}, p=${page.current+1})}">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" th:href="@{/admin/posts(f=${page.field},q=${page.query}, p=${page.pageMaxNum})}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                </th:block>
+            </ul>
+        </nav>
+    </section>
+</main>
+<th:block layout:fragment="src">
+<script th:src="@{/js/commons.js}"></script>
+<script th:src="@{/js/post/post.js}"></script>
+</th:block>
+</html>

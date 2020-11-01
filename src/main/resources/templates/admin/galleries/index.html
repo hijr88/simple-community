@@ -6,16 +6,20 @@
     <title>갤러리</title>
 </head>
 <main class="mb-5 px-3 clearfix" id="gallery-index" layout:fragment="content">
-    <nav class="px-3 mb-3">
-        <a th:href="@{/galleries/new}" class="btn btn-purple">이미지 올리기</a>
-    </nav>
+
+    <section class="px-3 mb-3" th:if="${page.content.size() != 0}">
+        <button class="btn btn-purple" onclick="updateGalleriesPub();">일괄 공개</button>
+        <button class="ml-5 btn btn-outline-purple" onclick="checkedGalleriesPub();">전체 선택</button>
+        <button class="btn btn-outline-danger" onclick="unCheckedGalleriesPub();">전체 해제</button>
+    </section>
 
     <section id="gallery-img" th:if="${page.content.size() != 0}">
         <ul>
             <li th:each="g : ${page.content}">
                 <div class="responsive-gallery">
                     <div class="gallery">
-                        <a th:href="@{|/galleries/${g.id}}">
+                        <span class="check-box" th:classappend="${g.pub} ? 'checked' " th:data-gno="${g.id}" onclick="toggleGalleryChecked(this);"></span>
+                        <a th:href="@{|/admin/galleries/${g.id}}">
                             <span aria-label="슬라이드" class="multiple" th:if="${g.childCount != 1}"></span>
                             <img th:src="@{|/files/thumb/gallery/${g.id}/${g.fileName}(w=250,h=250)}" alt="picture">
                         </a>
@@ -24,6 +28,7 @@
             </li>
         </ul>
     </section>
+    <input type="hidden" name="allNo" th:value="${allNo}">
 
     <section class="container" id="empty" th:if="${page.content.size() == 0}">
         <div class="text-center">
@@ -37,12 +42,12 @@
             <ul class="pagination">
                 <th:block th:if="${page.current != 1}">
                     <li class="page-item">
-                        <a class="page-link" th:href="@{/galleries(p=1)}">
+                        <a class="page-link" th:href="@{/admin/galleries(p=1)}">
                             <i class="fas fa-angle-double-left"></i>
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" th:href="@{|/galleries(p=${page.current -1})}">
+                        <a class="page-link" th:href="@{|/admin/galleries(p=${page.current -1})}">
                             <i class="fas fa-angle-left"></i>
                         </a>
                     </li>
@@ -54,12 +59,12 @@
                 </th:block>
                 <th:block th:if="${page.current < page.pageMaxNum}">
                     <li class="page-item">
-                        <a class="page-link" th:href="@{/galleries(p=${page.current +1})}">
+                        <a class="page-link" th:href="@{/admin/galleries(p=${page.current +1})}">
                             <i class="fas fa-angle-right"></i>
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" th:href="@{/galleries(p=${page.pageMaxNum})}">
+                        <a class="page-link" th:href="@{/admin/galleries(p=${page.pageMaxNum})}">
                             <i class="fas fa-angle-double-right"></i>
                         </a>
                     </li>
@@ -68,4 +73,8 @@
         </nav>
     </section>
 </main>
+<th:block layout:fragment="src">
+    <script th:src="@{/js/commons.js}"></script>
+    <script th:src="@{/js/gallery.js}"></script>
+</th:block>
 </html>

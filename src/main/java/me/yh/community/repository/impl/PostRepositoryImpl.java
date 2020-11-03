@@ -34,7 +34,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         QComment comment = QComment.comment;
 
         return queryFactory
-                .select(new QPostListDto(post.id, post.title, post.member.nickname, post.createDate, recommend.countDistinct(), post.hit, post.dept, comment.countDistinct(), post.pub ) )
+                .select(new QPostListDto(post.id, post.title, post.member.nickname, post.createDate, recommend.memberId.countDistinct(), post.hit, post.dept, comment.countDistinct(), post.pub ) )
                 .from(post)
                 .join(post.member, member)
                 .leftJoin(recommend).on(post.id.eq(recommend.postId))
@@ -44,7 +44,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                         post.delete.eq(false),
                         fieldEq(page)
                 )
-                .groupBy(post.id, post.title, post.member.nickname, post.createDate, post.hit, post.dept)
+                .groupBy(post.id, post.title, post.member.nickname, post.createDate, post.hit, post.dept, post.pub)
                 .orderBy(post.groupNo.desc(), post.groupOrder.asc())
                 .offset(offset).limit(10)
                 .fetch();
@@ -70,7 +70,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         QPostFile file = postFile;
 
         PostDetailDto postDetail = queryFactory
-                .select(new QPostDetailDto(post.id, post.title, post.content, member.id, member.nickname, member.profileImage, post.createDate, post.hit, recommend.countDistinct(), file.fileName, file.originalFileName, post.pub))
+                .select(new QPostDetailDto(post.id, post.title, post.content, member.id, member.nickname, member.profileImage, post.createDate, post.hit, recommend.count(), file.fileName, file.originalFileName, post.pub))
                 .from(post)
                 .join(post.member, member)
                 .leftJoin(post.files, file)

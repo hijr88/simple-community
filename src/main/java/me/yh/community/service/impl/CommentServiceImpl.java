@@ -37,7 +37,7 @@ public class CommentServiceImpl implements CommentService {
         long offset = (page -1) * 10;
 
         resultMap.put("list", commentRepository.findChildCommentListById(commentId, offset, limit));
-        resultMap.put("count", commentRepository.countByPostId(commentId));
+        resultMap.put("count", commentRepository.countByParent(commentId));
 
         return resultMap;
     }
